@@ -4,3 +4,5 @@
 .classpath
 .factorypath
 target
+pom.xml
+api/src/main/resources/application.properties
