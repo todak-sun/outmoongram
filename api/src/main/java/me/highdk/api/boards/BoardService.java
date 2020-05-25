@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BoardService {
 
+	
+	///Field
 	private final BoardRepository boardRepository;
 
 	@Autowired
@@ -26,6 +28,9 @@ public class BoardService {
 		this.boardRepository = boardRepository;
 	}
 
+	
+	
+	///Method
 	public EntityModel<Board> create(Board board) {
 		
 //		board에 id만 넣어주고, writtenAt, updatedAt을 넣어주지 않는다

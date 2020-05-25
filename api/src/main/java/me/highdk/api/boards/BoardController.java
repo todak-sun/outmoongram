@@ -1,11 +1,18 @@
 package me.highdk.api.boards;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +38,23 @@ public class BoardController {
 
 
 	@PostMapping(value = "", produces = MediaTypes.HAL_JSON_VALUE)
-	public ResponseEntity<?> create(@RequestBody Board board){
+	public ResponseEntity<?> create(@Valid @RequestBody Board board){
+		
+//		valid 확인용.. 따로 ExceptionHandler를 만들어 관리한다.
+//		if(bindingResult.hasErrors()) {
+//			
+//			List<ObjectError> errList = bindingResult.getAllErrors();
+//			
+//			errList.stream()
+//					.forEach((err) -> {
+//						System.out.println("===> er "+ err);
+//			});
+//			
+//			ResponseEntity<?> response =  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+//			
+//			return response;
+//		}
+		
 		
 		EntityModel<Board> resource =  boardService.create(board);
 		ResponseEntity<?> response =  ResponseEntity.status(HttpStatus.OK).body(resource);

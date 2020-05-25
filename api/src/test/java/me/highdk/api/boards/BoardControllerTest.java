@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
@@ -23,8 +24,11 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootTest
 @ActiveProfiles("Test")
+@Slf4j
 public class BoardControllerTest {
 
 	@Autowired
@@ -48,7 +52,7 @@ public class BoardControllerTest {
 	public void create() throws Exception{
 		
 		Board board = Board.builder()
-				.title("Test title")
+				.title("test Title")
 				.content("Controller Test content")
 				.build();
 		
@@ -108,11 +112,28 @@ public class BoardControllerTest {
 	}
 	
 	
-	@Test
+//	@Test
 	@DisplayName("DELETE METHOD 테스트")
 	public void delete() throws Exception {
 		this.mvc.perform(MockMvcRequestBuilders.delete("/api/boards/4").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON))
 				.andExpect(status().isOk());
+	}
+	
+	@Test
+	@DisplayName(value = "생성_ 유효성 검사 ")
+	public void validCheckCreate() throws Exception{
+		
+		Board board = Board.builder()
+				.title("")
+				.build();
+		
+		log.info("board: "+ board);
+		
+		String content = objectMapper.writeValueAsString(board);
+		
+		this.mvc.perform(MockMvcRequestBuilders.post("/api/boards").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON)
+				.content(content)
+				).andExpect(status().isBadRequest());
 	}
 
 }
