@@ -24,6 +24,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -119,7 +120,7 @@ public class BoardControllerTest {
 				.andExpect(status().isOk());
 	}
 	
-	@Test
+//	@Test
 	@DisplayName(value = "생성_ 유효성 검사 ")
 	public void validCheckCreate() throws Exception{
 		
@@ -134,6 +135,39 @@ public class BoardControllerTest {
 		this.mvc.perform(MockMvcRequestBuilders.post("/api/boards").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON)
 				.content(content)
 				).andExpect(status().isBadRequest());
+	}
+	
+//	@Test
+	@DisplayName(value="조회_유효성 검사")
+	public void validCheckGet() throws Exception{
+		
+		this.mvc.perform(get("/api/boards/100").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON))
+		.andExpect(status().isBadRequest());
+		
+	}
+	
+//	@Test
+	@DisplayName(value = "수정_ 유효성 검사")
+	public void validCheckUpdate() throws Exception{
+		
+		Board board = Board.builder()
+						.id(3L)
+						.title("update Title")
+						.content("update!")
+						.build();
+		
+		this.mvc.perform(MockMvcRequestBuilders.put("/api/boards").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON)
+				.content(objectMapper.writeValueAsString(board)))
+				.andExpect(status().isBadRequest());
+		
+	}
+	
+	@Test
+	@DisplayName(value="삭제_ 유효성 검사")
+	public void validCheckDelete()throws Exception{
+		
+		this.mvc.perform(MockMvcRequestBuilders.delete("/api/boards/5").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON))
+		.andExpect(status().isBadRequest());
 	}
 
 }

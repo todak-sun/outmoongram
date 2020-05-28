@@ -88,7 +88,8 @@ public class BoardService {
 		
 		if(updatedCnt < 1) {
 //			어떻게 처리할지 잘 모르겠어서 일단 Error 던진다
-			throw new Error("update failed");
+//			throw new Error("update failed");
+			return null;
 		};
 		
 		return boardRepository.findById(board.getId()).map(b->
@@ -96,18 +97,18 @@ public class BoardService {
 												).orElseGet(null);
 	}
 	
-	public EntityModel<Board> delete(Long id) {
+	public EntityModel<String> delete(Long id) {
 		
 //		문제가 있따 .....null을 넣으면 작동을 안한다.
-		Board board = new Board();
+//		Board board = new Board();
 		
 //		delete 실패시 자기 자신 링크 다시 보냄..
 		if(boardRepository.deleteById(id) < 1) {
-			return EntityModel.of(board, linkTo(BoardController.class).slash(id).withSelfRel());
+			return EntityModel.of("fail", linkTo(BoardController.class).slash(id).withSelfRel());
 		}
 		
 //		delete 성공시 list 링크 담아서 보냄 
-		return EntityModel.of(board, linkTo(BoardController.class).withRel("list"));
+		return EntityModel.of("success", linkTo(BoardController.class).withRel("list"));
 	}
 	
 	
