@@ -166,7 +166,7 @@ public class BoardControllerTest {
 	@DisplayName(value="삭제_ 유효성 검사")
 	public void validCheckDelete()throws Exception{
 		
-		this.mvc.perform(MockMvcRequestBuilders.delete("/api/boards/5").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON))
+		this.mvc.perform(MockMvcRequestBuilders.delete("/api/boards/100").contentType(MediaType.APPLICATION_JSON).accept(MediaTypes.HAL_JSON))
 		.andExpect(status().isBadRequest());
 	}
 
