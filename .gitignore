@@ -5,3 +5,5 @@
 .factorypath
 target
 .DS_Store
+pom.xml
+api/src/main/resources/application.properties
