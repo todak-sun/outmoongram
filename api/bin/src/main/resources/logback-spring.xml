@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+	
+	<appender name="sql-console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<Pattern>%d %5p [%c] %m%n</Pattern>
+		</encoder>
+	</appender>
+		
+	
+	<!-- 좀 더 보기 좋은 MyBatis 쿼리 Log : log4jdbc -->
+	<logger name="jdbc.sqlonly" level="debug" appender-ref="sql-console"/>
+	<logger name="jdbc.sqltiming" level="off" appender-ref="sql-console"/>
+	<logger name="jdbc.audit" level="off" appender-ref="sql-console"/>
+	<logger name="jdbc.resultset" level="off" appender-ref="sql-console"/>
+	<logger name="jdbc.resultsettable" level="debug" appender-ref="sql-console"/>
+	<logger name="jdbc.connection" level="off" appender-ref="sql-console"/>
+	
+	<!-- 
+		jdbc.sqlonly : SQL만 log. prepared statement에서 실행된 SQL은 해당 위치에 바인딩된 argument로 자동으로 표시되므로 가독성이 크게 향상된다.
+		jdbc.sqltiming : 실행시간과 SQL log
+		jdbc.audit : ResultSets을 제외한 모든 JDBC 호출 log. 이는 매우 방대한 출력이며 특정 JDBC 문제를 추적할 경우가 아니면 일반적으로 필요하지 않음
+		jdbc.resultset : ResultSet 객체에 대한 모든 호출이 기록되므로 훨씬 더 방대
+		jdbc.resultsettable : 테이블로 jdbc 결과를 log. Level debug는 result set에서 읽지 않은 값을 채운다
+		jdbc.connection : connection open, close 이벤트를 기록하고 열려있는 모든 connection number를 dump. connection 누수 문제를 해결하는데 매우 유용
+		위 내용을 참고하여 각자 용도에 맞게 level 설정하여 사용
+	 --> 
+</configuration>

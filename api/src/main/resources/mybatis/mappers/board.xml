@@ -4,6 +4,25 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="me.highdk.api.boards.BoardRepository">
+
+<!-- 	selectKey를 지원하지 않는 DB에서 insert한 key Select 해올  때 --> 
+	<insert id="create" useGeneratedKeys="true" keyProperty="id"
+			parameterType="me.highdk.api.boards.Board">
+			
+		INSERT
+		INTO	BOARD (
+				TITLE,
+				CONTENT,
+				WRITTEN_AT,
+				UPDATED_AT
+				)
+		VALUES(
+				#{title},
+				#{content},
+				now(),
+				now()	
+		)
+	</insert>
 	
 	<select id="findAll" resultType="me.highdk.api.boards.Board">
 		SELECT  ID,
@@ -24,10 +43,27 @@
 		 WHERE  ID = #{id}
 	</select>
 	
-	<insert id="save" parameterType="me.highdk.api.boards.Board">
+	<update id="update" parameterType="me.highdk.api.boards.Board">
+		UPDATE	BOARD
+		SET	
+				TITLE = #{title},
+				CONTENT = #{content},
+				UPDATED_AT = now()
+		WHERE	ID = #{id}
+		
+	</update>
+	
+<!-- 	실제로 지우진 않을 거지만 CRUD 연습 취지로 만듬 -->
+	<delete id="deleteById">
+		DELETE 
+		FROM	BOARD
+		WHERE 	id = #{id}
+	</delete>
+	
+<!-- 	<insert id="save" parameterType="me.highdk.api.boards.Board">
 		INSERT INTO BOARD(TITLE, CONTENT, WRITTEN_AT, UPDATED_AT)
 		VALUES(#{title}, #{content}, now(), now())
-	</insert>
+	</insert> -->
 	
 	<select id="now" resultType="java.util.Date">
 		SELECT NOW()

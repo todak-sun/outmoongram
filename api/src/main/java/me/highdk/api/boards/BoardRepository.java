@@ -17,6 +17,11 @@ public interface BoardRepository {
 	
 	public List<Board> findAll();
 	
+	public int update(Board board);
+	
+//	실제로는 flag 처리하겠지만, 연습용으로 작성
+	public int deleteById(Long id);
+	
 	public Date now();
 
 	

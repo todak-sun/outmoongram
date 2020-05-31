@@ -1,0 +1,25 @@
+{
+  "commentList": [
+    {
+      "id": 1,
+      "content": "댓글의 내용",
+      "writerId": 1,
+      "nickName": "댓글 작성자 별명",
+      "writtenAt": "2010-11-11 11:11:11",
+      "updatedAt": "2010-11-11 11:11:11",
+      "likeCnt": 1,
+      "commentCnt": 1,
+      "subCommentList": [
+        {
+          "id": 1,
+          "content": "댓글의 내용",
+          "writerId": 1,
+          "nickName": "댓글 작성자 별명",
+          "writtenAt": "2010-11-11 11:11:11",
+          "updatedAt": "2010-11-11 11:11:11",
+          "likeCnt": 1
+        }
+      ]
+    }
+  ]
+}
