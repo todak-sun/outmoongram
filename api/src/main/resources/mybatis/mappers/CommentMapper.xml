@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.highdk.api.v1.comment.CommentDao">
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="me.highdk.api.v1.comment.Comment">
+		INSERT
+			INTO
+			OUTMOON_CMT(
+				PARENT_ID, CONTENT, WRITTEN_AT, UPDATED_AT, POST_ID, WRITER_ID
+			)
+		VALUES(
+			#{parentId}, #{content}, now(), now(), #{postId}, #{writerId}
+			);
+	</insert>
+	
+	<select id="getById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.comment.Comment">
+		SELECT
+			ID,
+			PARENT_ID,
+			CONTENT,
+			WRITTEN_AT,
+			UPDATED_AT,
+			LIKE_CNT,
+			COMMENT_CNT,
+			POST_ID,
+			WRITER_ID
+		FROM
+			OUTMOON_CMT
+		WHERE
+			ID = #{id};
+	</select>
+	
+	<select id="findById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.comment.Comment">
+		SELECT
+			ID,
+			PARENT_ID,
+			CONTENT,
+			WRITTEN_AT,
+			UPDATED_AT,
+			LIKE_CNT,
+			COMMENT_CNT,
+			POST_ID,
+			WRITER_ID
+		FROM
+			OUTMOON_CMT
+		WHERE
+			ID = #{id};
+	</select>
+</mapper>
