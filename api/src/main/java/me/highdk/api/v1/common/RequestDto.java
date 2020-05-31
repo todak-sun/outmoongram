@@ -1,4 +1,4 @@
-package me.highdk.api.vi.common;
+package me.highdk.api.v1.common;
 
 import lombok.Getter;
 import lombok.Setter;
