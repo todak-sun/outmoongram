@@ -2,6 +2,9 @@ package me.highdk.api.v1.comment;
 
 import java.time.LocalDateTime;
 
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +18,8 @@ import lombok.experimental.Accessors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentResponse {
+@Relation(collectionRelation = "comments")
+public class CommentResponse extends RepresentationModel<CommentResponse> {
 
 	private Long id;
 
