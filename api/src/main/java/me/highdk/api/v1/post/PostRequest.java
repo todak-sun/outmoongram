@@ -22,4 +22,5 @@ public class PostRequest extends RequestDto{
 	
 	private Long writerId;
 	
+	
 }
