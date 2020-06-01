@@ -2,6 +2,8 @@ package me.highdk.api.v1.post;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotEmpty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +23,7 @@ public class Post {
 
 	private Long id;
 
+	@NotEmpty
 	private String content;
 
 	private LocalDateTime writtenAt;
@@ -31,6 +34,7 @@ public class Post {
 
 	private Integer commentCnt;
 
+	@NotEmpty
 	private Long writerId;
 
 }
