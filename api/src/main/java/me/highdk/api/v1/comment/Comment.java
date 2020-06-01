@@ -21,10 +21,6 @@ public class Comment {
 	
 	private Long parentId;
 	
-	private Integer depth;
-	
-	private Integer sort;
-	
 	private String content;
 	
 	private LocalDateTime writtenAt;
