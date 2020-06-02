@@ -1,0 +1,135 @@
+--------테스트 데이터 생성쿼리
+
+--유저
+INSERT
+	INTO
+	OUTMOON_USER(
+		USER_NAME, PASSWORD, NICK_NAME, REGISTERED_AT, UPDATED_AT
+	)
+VALUES(
+	'tjsdydwn@gmail.com', '1234', 'todak', now(), now()
+);
+
+INSERT
+	INTO
+	OUTMOON_USER(
+		USER_NAME, PASSWORD, NICK_NAME, REGISTERED_AT, UPDATED_AT
+	)
+VALUES(
+	'yjsun@gntsolution.com', '1234', 'yongjoo_sun', now(), now()
+);
+-- SELECT * FROM OUTMOON_USER;
+
+
+-- Post
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다.', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다12413.', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다1232323413.', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트ㄴㅇㄴㅇ 게', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트ㄴㅇㄴㅁㄴㅇㄻㄴㅇㄻㄴㅇㄻㄴㅇ 게', now(), now(), 1
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다.', now(), now(), 2
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다12413.', now(), now(), 2
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게시물의 내용입니다1232323413.', now(), now(), 2
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트 게', now(), now(), 2
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트ㄴㅇㄴㅇ 게', now(), now(), 2
+);
+
+INSERT
+	INTO
+	OUTMOON_POST(
+		CONTENT, UPDATED_AT, WRITTEN_AT, WRITER_ID
+	)
+VALUES(
+	'테스트ㄴㅇㄴㅁㄴㅇㄻㄴㅇㄻㄴㅇㄻㄴㅇ 게', now(), now(), 2
+);
+
+-- SELECT * FROM OUTMOON_POST;
+
+-- SELECT * FROM OUTMOON_CMT;
