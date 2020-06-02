@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import me.highdk.api.v1.common.RequestDto;
+import me.highdk.api.vi.common.RequestDto;
 
 @Getter
 @Setter

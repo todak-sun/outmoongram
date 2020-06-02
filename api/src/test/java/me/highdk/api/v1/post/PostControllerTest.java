@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ class PostControllerTest {
 	}
 
 	@Test
+	@DisplayName(value="Create 테스트")
 	public void createTest() throws Exception {
 		
 		PostRequest request = PostRequest.builder()
@@ -53,9 +55,20 @@ class PostControllerTest {
 		
 		this.mvc.perform(post("/v1/api/posts")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				.content(str))
 				.andExpect(status().isCreated())
 				.andExpect(header().exists("Location"));
+		
+		PostRequest request2 = PostRequest.builder()
+				.content("내용입니다")
+				.build();
+		
+		String str2 = objectMapper.writeValueAsString(request2);
+		
+		this.mvc.perform(post("/v1/api/posts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(str2))
+				.andExpect(status().isBadRequest());
 	}
 
 }
