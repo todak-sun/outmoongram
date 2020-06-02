@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +54,18 @@ public class CommentController {
 				.body(resource);
 	}
 	
-	//TODO: SYJ, 추가 예정.
+	//TODO: SYJ, 페이징 다시 해야함 ㅠㅠㅠ...
 	@GetMapping
-	public ResponseEntity<?> readWithPaged(PageDto pageDto){
-		log.info("pageDto.start : {}, pageDto.size : {} ", pageDto.getStart(), pageDto.getSize());
+	public ResponseEntity<?> readWithPaged(
+								@RequestParam(required = true)  Long postId, 
+								PageDto pageDto){
+		log.info("/v1/api/comments");
+		log.debug("Post Id is : {}, Page Information : {}",postId, pageDto);
+		
+		PagedModel<CommentResponse> resource = commentService.readPaged(postId, pageDto);
 		
 		return ResponseEntity.status(HttpStatus.OK)
-							 .body(null);
+							 .body(resource);
 	}
 	
 	@GetMapping("/{id}")

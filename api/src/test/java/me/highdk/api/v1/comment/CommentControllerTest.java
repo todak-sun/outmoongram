@@ -59,7 +59,7 @@ class CommentControllerTest {
 		
 		this.mvc.perform(post("/v1/api/comments")
 				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
+				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated())
 				.andExpect(header().exists("Location"))
@@ -91,7 +91,7 @@ class CommentControllerTest {
 		
 		this.mvc.perform(post("/v1/api/comments")
 				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
+				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
 				.andExpect(content().contentType(MediaTypes.HAL_JSON))
@@ -134,7 +134,8 @@ class CommentControllerTest {
 	@Test
 	@DisplayName(value = "페이징 테스트")
 	public void get_with_paging() throws Exception{
-		this.mvc.perform(get("/v1/api/comments"))
+		this.mvc.perform(get("/v1/api/comments")
+				.param("postId", "1"))
 			.andExpect(status().isOk());
 	}
 	
@@ -143,10 +144,17 @@ class CommentControllerTest {
 	@DisplayName(value = "페이징 테스트")
 	public void get_with_paging_with_params() throws Exception{
 		this.mvc.perform(get("/v1/api/comments")
+				.param("postId", "1")
 				.param("start", "10")
 				.param("size", "40")
 				)
 			.andExpect(status().isOk());
+	}
+	
+	@Test
+	@DisplayName(value = "postId없이 페이징 호출 테스트")
+	public void get_with_paging_without_post_id() {
+		
 	}
 	
 	//TODO: SYJ, 조금 더 보완할 것.
@@ -157,11 +165,17 @@ class CommentControllerTest {
 			.andExpect(status().isOk());
 	}
 	
-	//TODO: SYJ, 조금 더 보완할 것.
 	@Test
 	@DisplayName(value = "없는 답글을 가져오는 테스트")
 	public void get_one_not_found() throws Exception{
 		this.mvc.perform(get("/v1/api/comments/999999999"))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("name").exists())
+			.andExpect(jsonPath("message").exists())
+			.andExpect(jsonPath("rejectedValue").exists())
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("_links.index").exists())
+			.andExpect(jsonPath("_links.index.href").exists())
+			;
 	}
 }
