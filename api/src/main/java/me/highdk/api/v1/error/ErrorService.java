@@ -40,7 +40,7 @@ public class ErrorService {
 	}
 	
 
-	
+	//에러해결
 	public ErrorResponse toResponse(ErrorDto errorDto) {
 		return ErrorResponse.builder()
 							.name(errorDto.getName())
