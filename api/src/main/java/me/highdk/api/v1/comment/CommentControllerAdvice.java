@@ -1,17 +1,14 @@
 package me.highdk.api.v1.comment;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
-import java.util.List;
-
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import me.highdk.api.v1.error.ErrorResponse;
 import me.highdk.api.v1.error.ErrorService;
-import me.highdk.api.v1.index.IndexController;
 
 @RestControllerAdvice
 public class CommentControllerAdvice {
@@ -23,10 +20,16 @@ public class CommentControllerAdvice {
 	}
 
 	@ExceptionHandler(CommentBadRequestException.class)
-	public ResponseEntity<?> badRequest(CommentBadRequestException exception) {
-		List<ErrorResponse> errors =  errorService.toResponse(exception.getErrors());
-		CollectionModel<ErrorResponse> resource = CollectionModel.of(errors);
-		resource.add(linkTo(IndexController.class).withRel("index"));
-		return ResponseEntity.badRequest().body(resource);
+	public ResponseEntity<?> badRequest400(CommentBadRequestException exception) {
+		CollectionModel<ErrorResponse> resource = errorService.toResponse(exception.getErrors());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							 .body(resource);
+	}
+	
+	@ExceptionHandler(CommentNotFoundException.class)
+	public ResponseEntity<?> notFound404(CommentNotFoundException exception){
+		EntityModel<ErrorResponse> resource = errorService.toResponse("id", "해당 댓글은 존재하지 않습니다", exception.getId());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+							  .body(resource);
 	}
 }

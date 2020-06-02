@@ -18,11 +18,11 @@ import lombok.experimental.Accessors;
 @Builder
 @Relation(collectionRelation = "errors")
 public class ErrorResponse extends RepresentationModel<ErrorResponse>{
-
+	
 	private String name;
 
 	private String message;
 
 	private Object rejectedValue;
-
+	
 }

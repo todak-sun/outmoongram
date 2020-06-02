@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import me.highdk.api.v1.common.OutmoonService;
-import me.highdk.api.v1.common.exception.NotFoundException;
 import me.highdk.api.v1.post.PostController;
 
 @Slf4j
@@ -44,7 +43,7 @@ public class CommentService implements OutmoonService<Comment, CommentRequest, C
 						  })
 						 .orElseThrow(() -> {
 							 log.info("NotFoundException!!! : {}", id);
-							 throw new NotFoundException(id);
+							 throw new CommentNotFoundException(id);
 						  });
 									  
 	}
