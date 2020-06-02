@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import me.highdk.api.vi.common.RequestDto;
+import me.highdk.api.v1.common.RequestDto;
 
 @Getter
 @Setter
@@ -21,6 +21,5 @@ public class PostRequest extends RequestDto{
 	private String content;
 	
 	private Long writerId;
-	
 	
 }
