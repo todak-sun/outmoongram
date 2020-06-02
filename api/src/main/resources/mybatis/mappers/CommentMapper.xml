@@ -48,4 +48,57 @@
 		WHERE
 			ID = #{id};
 	</select>
+	
+	<select id="getByPostId" resultType="me.highdk.api.v1.comment.Comment">
+		WITH RECURSIVE MAIN AS (
+			SELECT
+				ARRAY [ID] AS LEVEL,
+				ID,
+				PARENT_ID,
+				CONTENT,
+				WRITTEN_AT,
+				UPDATED_AT,
+				LIKE_CNT,
+				COMMENT_CNT,
+				POST_ID,
+				WRITER_ID
+			FROM
+				OUTMOON_CMT
+			WHERE
+				POST_ID = #{postId}
+				AND PARENT_ID = 0
+			UNION
+			ALL
+			SELECT
+				LEVEL || OC.PARENT_ID,
+				OC.ID,
+				OC.PARENT_ID,
+				OC.CONTENT,
+				OC.WRITTEN_AT,
+				OC.UPDATED_AT,
+				OC.LIKE_CNT,
+				OC.COMMENT_CNT,
+				OC.POST_ID,
+				OC.WRITER_ID
+			FROM
+				OUTMOON_CMT AS OC
+				JOIN MAIN ON MAIN.ID = OC.PARENT_ID
+		)
+		SELECT
+			ID,
+			PARENT_ID,
+			CONTENT,
+			WRITTEN_AT,
+			UPDATED_AT,
+			LIKE_CNT,
+			COMMENT_CNT,
+			POST_ID,
+			WRITER_ID
+		FROM
+			MAIN
+		ORDER BY
+			LEVEL 
+		OFFSET ${pageDto.start}		
+		LIMIT  ${pageDto.size};		
+	</select>
 </mapper>

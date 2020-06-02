@@ -3,17 +3,25 @@ package me.highdk.api.v1.comment;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import me.highdk.api.v1.common.OutmoonService;
+import me.highdk.api.v1.common.OutmoonDetailService;
+import me.highdk.api.v1.common.PageDto;
 import me.highdk.api.v1.post.PostController;
 
 @Slf4j
 @Service
-public class CommentService implements OutmoonService<Comment, CommentRequest, CommentResponse>{
+public class CommentService implements OutmoonDetailService<Comment, CommentRequest, CommentResponse>{
 	
 	private final CommentRepository commentRepository;
 	
@@ -28,7 +36,7 @@ public class CommentService implements OutmoonService<Comment, CommentRequest, C
 		Comment savedComment = commentRepository.save(newComment);
 		CommentResponse response = this.toResponse(savedComment); 
 		
-		EntityModel<CommentResponse> resource = EntityModel.of(response);
+		var resource = this.toResource(response);
 		resource.add(linkTo(CommentController.class).slash(response.getId()).withSelfRel());
 		resource.add(linkTo(PostController.class).slash(response.getPostId()).withRel("post"));
 		return resource;
@@ -37,7 +45,7 @@ public class CommentService implements OutmoonService<Comment, CommentRequest, C
 	public EntityModel<CommentResponse> readOne(Long id) {
 		return commentRepository.findById(id)
 						 .map(comment -> {
-							EntityModel<CommentResponse> resource = EntityModel.of(this.toResponse(comment));
+							var resource = this.toResource(this.toResponse(comment));
 							resource.add(linkTo(methodOn(CommentController.class).readOne(id)).withSelfRel());
 							return resource;
 						  })
@@ -45,8 +53,15 @@ public class CommentService implements OutmoonService<Comment, CommentRequest, C
 							 log.info("NotFoundException!!! : {}", id);
 							 throw new CommentNotFoundException(id);
 						  });
-									  
 	}
+	
+	public PagedModel<CommentResponse> readPaged(Long postId, PageDto pageDto) {
+		List<Comment> comments = commentRepository.findByPostId(postId, pageDto);
+		PageMetadata metadata = new PageMetadata(10L, 1L, 100L);
+//		PagedModel.of(comments, metadata)
+		return PagedModel.of(this.toResponse(comments), metadata);
+	}	
+	
 	
 	@Override
 	public CommentResponse toResponse(Comment comment) {
@@ -76,5 +91,13 @@ public class CommentService implements OutmoonService<Comment, CommentRequest, C
 					  .postId(request.getPostId())
 					  .writerId(request.getWriterId())
 					  .build();
-	}	
+	}
+
+	@Override
+	public List<CommentResponse> toResponse(List<Comment> comments) {
+		return comments.stream().map(this::toResponse)
+								.collect(Collectors.toList());
+	}
+
+	
 }

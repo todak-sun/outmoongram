@@ -21,14 +21,14 @@ public class CommentControllerAdvice {
 
 	@ExceptionHandler(CommentBadRequestException.class)
 	public ResponseEntity<?> badRequest400(CommentBadRequestException exception) {
-		CollectionModel<ErrorResponse> resource = errorService.toResponse(exception.getErrors());
+		CollectionModel<ErrorResponse> resource = errorService.badReqeust400(exception.getErrors());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 							 .body(resource);
 	}
 	
 	@ExceptionHandler(CommentNotFoundException.class)
 	public ResponseEntity<?> notFound404(CommentNotFoundException exception){
-		EntityModel<ErrorResponse> resource = errorService.toResponse("id", "해당 댓글은 존재하지 않습니다", exception.getId());
+		EntityModel<ErrorResponse> resource = errorService.notFound404(exception.getError());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 							  .body(resource);
 	}

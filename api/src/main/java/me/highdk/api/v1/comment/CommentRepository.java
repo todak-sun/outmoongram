@@ -1,12 +1,15 @@
 package me.highdk.api.v1.comment;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import me.highdk.api.v1.common.OutmoonRepository;
+import me.highdk.api.v1.common.PageDto;
 
 @Repository
 public class CommentRepository implements OutmoonRepository<Long, Comment>{
@@ -28,6 +31,10 @@ public class CommentRepository implements OutmoonRepository<Long, Comment>{
 	@Override
 	public Optional<Comment> findById(Long id) {
 		return commentDao.findById(id);
+	}
+
+	public List<Comment> findByPostId(Long postId, PageDto pageDto) {
+		return commentDao.getByPostId(postId, pageDto);
 	}
 	
 	
