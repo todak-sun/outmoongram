@@ -7,16 +7,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import me.highdk.api.v1.common.OutmoonDetailService;
 import me.highdk.api.v1.common.PageDto;
+import me.highdk.api.v1.index.IndexController;
 import me.highdk.api.v1.post.PostController;
 
 @Slf4j
@@ -31,14 +33,15 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 	}
 	
 	@Override
+	@Transactional
 	public EntityModel<CommentResponse> create(CommentRequest request) {
 		Comment newComment = this.toEntity(request);
 		Comment savedComment = commentRepository.save(newComment);
-		CommentResponse response = this.toResponse(savedComment); 
 		
-		var resource = this.toResource(response);
-		resource.add(linkTo(CommentController.class).slash(response.getId()).withSelfRel());
-		resource.add(linkTo(PostController.class).slash(response.getPostId()).withRel("post"));
+		var resource = this.toResource(savedComment);
+		resource.add(linkTo(CommentController.class).slash(savedComment.getId()).withSelfRel());
+		resource.add(linkTo(PostController.class).slash(savedComment.getPostId()).withRel("post"));
+		
 		return resource;
 	}
 	
@@ -56,12 +59,70 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 	}
 	
 	public PagedModel<CommentResponse> readPaged(Long postId, PageDto pageDto) {
-		List<Comment> comments = commentRepository.findByPostId(postId, pageDto);
-		PageMetadata metadata = new PageMetadata(10L, 1L, 100L);
-//		PagedModel.of(comments, metadata)
-		return PagedModel.of(this.toResponse(comments), metadata);
+		
+		var comments = commentRepository.findByPostId(postId, pageDto);
+		
+		/**
+		 * 
+		 *  postId에 해당하는 모든 댓글 중에서
+		 *  자식 댓글이 아닌 모든 댓글을 담는다.
+		 *  
+		 * */
+		var parentComments = comments.stream()
+									 .filter(comment -> comment.getParentId() == 0)
+						   		  	 .collect(Collectors.toList());
+		
+		var responses = this.toResponse(parentComments);
+		
+		/**
+		 * 
+		 * parentComments만 담긴 응답용 객체를 순회하면서
+		 * 자식 댓글을 응답용 객체로 변환하여 내부에 담는다. 
+		 *  
+		 * */
+		responses.forEach(response -> {
+			var childrenComments = comments.stream()
+										   .filter(cmt -> response.getId() == cmt.getParentId())
+					  					   .collect(Collectors.toList());
+			response.setComments(this.toResponse(childrenComments));
+		});
+		
+		Long totalElements = commentRepository.countsByPostId(postId);
+		
+		PageMetadata metadata = new PageMetadata(comments.size(), pageDto.getPage(), totalElements);
+		
+		var resource = PagedModel.of(responses, metadata);
+		
+		//TODO: SYJ, @ReqeustParam 말고도 querystring 만드는 방법 찾아서 적용 할 것...
+		Link indexLink = linkTo(methodOn(IndexController.class).index()).withRel("index");
+		Link selfLink = linkTo(methodOn(CommentController.class).readWithPaged(postId, pageDto)).withSelfRel();
+		Link nextLink = linkTo(methodOn(CommentController.class).readWithPaged(postId, new PageDto(pageDto.getStart() + pageDto.getSize(), pageDto.getSize()))).withRel("next").expand(pageDto);
+		resource.add(indexLink);
+		resource.add(selfLink);
+		resource.add(nextLink);
+		return resource;
 	}	
 	
+	@Transactional
+	public EntityModel<CommentResponse> updateOne(Long id, CommentRequest request) {
+		return commentRepository.findById(id)
+									   .map(comment -> {
+										   	comment.setContent(request.getContent());
+											Comment updatedComment = commentRepository.save(comment);
+											
+											var resource = this.toResource(updatedComment);
+											resource.add(linkTo(methodOn(CommentController.class).readOne(id)).withSelfRel());
+										
+											return resource;
+									   })
+									  .orElseThrow(() -> {
+										  throw new CommentNotFoundException(id);
+									   });
+	}
+	
+	public EntityModel<CommentResponse> toResource(Comment comment){
+		return this.toResource(this.toResponse(comment));
+	}
 	
 	@Override
 	public CommentResponse toResponse(Comment comment) {
@@ -98,6 +159,8 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 		return comments.stream().map(this::toResponse)
 								.collect(Collectors.toList());
 	}
+
+	
 
 	
 }

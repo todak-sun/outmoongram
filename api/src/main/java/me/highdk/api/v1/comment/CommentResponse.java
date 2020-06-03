@@ -1,9 +1,13 @@
 package me.highdk.api.v1.comment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,5 +42,8 @@ public class CommentResponse extends RepresentationModel<CommentResponse> {
 	private Long postId;
 
 	private Long writerId;
+	
+	@JsonInclude(Include.NON_EMPTY)
+	private List<CommentResponse> comments;
 
 }

@@ -52,39 +52,30 @@
 	<select id="getByPostId" resultType="me.highdk.api.v1.comment.Comment">
 		WITH RECURSIVE MAIN AS (
 			SELECT
-				ARRAY [ID] AS LEVEL,
-				ID,
-				PARENT_ID,
-				CONTENT,
-				WRITTEN_AT,
-				UPDATED_AT,
-				LIKE_CNT,
-				COMMENT_CNT,
-				POST_ID,
-				WRITER_ID
+				*
 			FROM
-				OUTMOON_CMT
-			WHERE
-				POST_ID = #{postId}
-				AND PARENT_ID = 0
-			UNION
-			ALL
+				(
+					SELECT
+						ARRAY [ID] AS LEVEL, ID, PARENT_ID, CONTENT, WRITTEN_AT, UPDATED_AT, LIKE_CNT, COMMENT_CNT, POST_ID, WRITER_ID
+					FROM
+						OUTMOON_CMT
+					WHERE
+						POST_ID = #{postId}
+						AND PARENT_ID = 0
+					ORDER BY ID
+					OFFSET ${pageDto.start}
+					LIMIT ${pageDto.size}
+				) AS T
+		UNION ALL
 			SELECT
-				LEVEL || OC.PARENT_ID,
-				OC.ID,
-				OC.PARENT_ID,
-				OC.CONTENT,
-				OC.WRITTEN_AT,
-				OC.UPDATED_AT,
-				OC.LIKE_CNT,
-				OC.COMMENT_CNT,
-				OC.POST_ID,
-				OC.WRITER_ID
+				LEVEL || OC.PARENT_ID, OC.ID, OC.PARENT_ID, OC.CONTENT, OC.WRITTEN_AT, OC.UPDATED_AT, OC.LIKE_CNT, OC.COMMENT_CNT, OC.POST_ID, OC.WRITER_ID
 			FROM
 				OUTMOON_CMT AS OC
-				JOIN MAIN ON MAIN.ID = OC.PARENT_ID
+			JOIN MAIN ON
+				MAIN.ID = OC.PARENT_ID
 		)
 		SELECT
+			LEVEL,
 			ID,
 			PARENT_ID,
 			CONTENT,
@@ -97,8 +88,26 @@
 		FROM
 			MAIN
 		ORDER BY
-			LEVEL 
-		OFFSET ${pageDto.start}		
-		LIMIT  ${pageDto.size};		
+			LEVEL,
+			ID;
 	</select>
+	
+	<select id="countsByPostId" resultType="java.lang.Long" parameterType="java.lang.Long">
+		SELECT 
+			COUNT(*) 
+		FROM
+			OUTMOON_CMT
+		WHERE
+			POST_ID = #{postId}; 
+	</select>
+	
+	<update id="update" parameterType="me.highdk.api.v1.comment.Comment">
+		UPDATE
+			OUTMOON_CMT
+		SET
+			CONTENT = #{content},
+			UPDATED_AT = now()
+		WHERE
+			ID = #{id};
+	</update>
 </mapper>

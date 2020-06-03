@@ -3,10 +3,8 @@ package me.highdk.api.v1.comment;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import me.highdk.api.v1.common.OutmoonRepository;
 import me.highdk.api.v1.common.PageDto;
@@ -21,11 +19,23 @@ public class CommentRepository implements OutmoonRepository<Long, Comment>{
 		this.commentDao = commentDao;
 	}
 	
-	@Transactional
+	
 	@Override
 	public Comment save(Comment comment) {
-		Integer affectedRowCount = commentDao.create(comment);
-		return commentDao.getById(comment.getId());
+		var optionalId = Optional.ofNullable(comment.getId());
+		if(optionalId.isEmpty()) {
+			int affectedRowCount = commentDao.create(comment);
+			if(affectedRowCount != 1) {
+				throw new RuntimeException();
+			}
+			return commentDao.getById(comment.getId());
+		} else {
+			int affectedRowCount = commentDao.update(comment);
+			if(affectedRowCount != 1) {
+				throw new RuntimeException();
+			}
+			return commentDao.getById(comment.getId());
+		}		
 	}
 
 	@Override
@@ -35,6 +45,10 @@ public class CommentRepository implements OutmoonRepository<Long, Comment>{
 
 	public List<Comment> findByPostId(Long postId, PageDto pageDto) {
 		return commentDao.getByPostId(postId, pageDto);
+	}
+
+	public Long countsByPostId(Long postId) {
+		return commentDao.countsByPostId(postId);
 	}
 	
 	
