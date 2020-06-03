@@ -1,0 +1,203 @@
+{
+    "_embedded": {
+        "comments": [{
+                "id": 1,
+                "parentId": 0,
+                "content": "댓글 테스트입니다...",
+                "writtenAt": "2020-05-31T22:05:18.471902",
+                "updatedAt": "2020-05-31T22:05:18.471902",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            },
+            {
+                "id": 2,
+                "parentId": 0,
+                "content": "댓글 테스트입니다...",
+                "writtenAt": "2020-05-31T22:06:15.800558",
+                "updatedAt": "2020-05-31T22:06:15.800558",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            },
+            {
+                "id": 11,
+                "parentId": 0,
+                "content": "댓글 테스트닷.",
+                "writtenAt": "2020-05-31T23:27:21.033335",
+                "updatedAt": "2020-05-31T23:27:21.033335",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 2,
+                "comments": [{
+                        "id": 17,
+                        "parentId": 11,
+                        "content": "자식 댓글1",
+                        "writtenAt": "2020-06-02T00:04:42.097172",
+                        "updatedAt": "2020-06-02T00:04:42.097172",
+                        "likeCnt": 0,
+                        "commentCnt": 0,
+                        "postId": 1,
+                        "writerId": 2
+                    },
+                    {
+                        "id": 18,
+                        "parentId": 11,
+                        "content": "자식 댓글2",
+                        "writtenAt": "2020-06-02T00:04:53.294866",
+                        "updatedAt": "2020-06-02T00:04:53.294866",
+                        "likeCnt": 0,
+                        "commentCnt": 0,
+                        "postId": 1,
+                        "writerId": 2
+                    },
+                    {
+                        "id": 19,
+                        "parentId": 11,
+                        "content": "자식 댓글3",
+                        "writtenAt": "2020-06-02T00:04:59.222746",
+                        "updatedAt": "2020-06-02T00:04:59.222746",
+                        "likeCnt": 0,
+                        "commentCnt": 0,
+                        "postId": 1,
+                        "writerId": 2
+                    },
+                    {
+                        "id": 20,
+                        "parentId": 11,
+                        "content": "자식 댓글4",
+                        "writtenAt": "2020-06-02T00:05:05.358524",
+                        "updatedAt": "2020-06-02T00:05:05.358524",
+                        "likeCnt": 0,
+                        "commentCnt": 0,
+                        "postId": 1,
+                        "writerId": 2
+                    },
+                    {
+                        "id": 21,
+                        "parentId": 11,
+                        "content": "자식 댓글5",
+                        "writtenAt": "2020-06-02T00:05:11.415924",
+                        "updatedAt": "2020-06-02T00:05:11.415924",
+                        "likeCnt": 0,
+                        "commentCnt": 0,
+                        "postId": 1,
+                        "writerId": 2
+                    }
+                ]
+            },
+            {
+                "id": 12,
+                "parentId": 0,
+                "content": "실패해야 하는 댓글 테스트",
+                "writtenAt": "2020-06-01T22:11:40.93241",
+                "updatedAt": "2020-06-01T22:11:40.93241",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1,
+                "comments": [{
+                    "id": 22,
+                    "parentId": 12,
+                    "content": "자식 댓글1",
+                    "writtenAt": "2020-06-02T00:05:19.613817",
+                    "updatedAt": "2020-06-02T00:05:19.613817",
+                    "likeCnt": 0,
+                    "commentCnt": 0,
+                    "postId": 1,
+                    "writerId": 2
+                }, {
+                    "id": 24,
+                    "parentId": 12,
+                    "content": "자식 댓글2",
+                    "writtenAt": "2020-06-02T00:05:34.750177",
+                    "updatedAt": "2020-06-02T00:05:34.750177",
+                    "likeCnt": 0,
+                    "commentCnt": 0,
+                    "postId": 1,
+                    "writerId": 2
+                }, {
+                    "id": 25,
+                    "parentId": 12,
+                    "content": "자식 댓글3",
+                    "writtenAt": "2020-06-02T00:05:39.638402",
+                    "updatedAt": "2020-06-02T00:05:39.638402",
+                    "likeCnt": 0,
+                    "commentCnt": 0,
+                    "postId": 1,
+                    "writerId": 2
+                }]
+            },
+            {
+                "id": 13,
+                "parentId": 0,
+                "content": "댓글 테스트입니다...",
+                "writtenAt": "2020-06-01T22:11:41.196608",
+                "updatedAt": "2020-06-01T22:11:41.196608",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1,
+                "comments": [{
+                    "id": 23,
+                    "parentId": 13,
+                    "content": "자식 댓글1",
+                    "writtenAt": "2020-06-02T00:05:26.46267",
+                    "updatedAt": "2020-06-02T00:05:26.46267",
+                    "likeCnt": 0,
+                    "commentCnt": 0,
+                    "postId": 1,
+                    "writerId": 2
+                }]
+            },
+            {
+                "id": 14,
+                "parentId": 0,
+                "content": "실패해야 하는 댓글 테스트",
+                "writtenAt": "2020-06-01T22:46:43.017068",
+                "updatedAt": "2020-06-01T22:46:43.017068",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            },
+            {
+                "id": 15,
+                "parentId": 0,
+                "content": "실패해야 하는 댓글 테스트",
+                "writtenAt": "2020-06-01T23:18:43.281749",
+                "updatedAt": "2020-06-01T23:18:43.281749",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            },
+            {
+                "id": 16,
+                "parentId": 0,
+                "content": "실패해야 하는 댓글 테스트",
+                "writtenAt": "2020-06-01T23:20:10.806999",
+                "updatedAt": "2020-06-01T23:20:10.806999",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            },
+            {
+                "id": 26,
+                "parentId": 0,
+                "content": "댓글 테스트입니다...",
+                "writtenAt": "2020-06-02T21:11:00.089862",
+                "updatedAt": "2020-06-02T21:11:00.089862",
+                "likeCnt": 0,
+                "commentCnt": 0,
+                "postId": 1,
+                "writerId": 1
+            }
+        ]
+    },
+    "page": { "size": 10, "totalElements": 100, "totalPages": 10, "number": 1 }
+}

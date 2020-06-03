@@ -11,12 +11,16 @@ import me.highdk.api.v1.common.PageDto;
 @Mapper
 public interface CommentDao {
 
-	public Integer create(Comment comment);
+	public int create(Comment comment);
 
 	public Comment getById(Long id);
 
 	public Optional<Comment> findById(Long id);
 
 	public List<Comment> getByPostId(@Param("postId") Long postId, @Param("pageDto") PageDto pageDto);
+
+	public Long countsByPostId(Long postId);
+
+	public int update(Comment comment);
 
 }

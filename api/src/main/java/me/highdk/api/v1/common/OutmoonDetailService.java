@@ -8,5 +8,5 @@ public interface OutmoonDetailService<Entity, Request, Response extends Represen
 	public EntityModel<Response> create(Request request);
 	
 	public Entity toEntity(Request request);
-	
+		
 }
