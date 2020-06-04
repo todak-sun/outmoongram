@@ -94,8 +94,9 @@ public class CommentController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteOne(@PathVariable Long id){
 		
+		String message = commentService.deleteOne(id);
 		return ResponseEntity.status(HttpStatus.OK)
-							 .body(null);
+							 .body(message);
 	}
 	
 }

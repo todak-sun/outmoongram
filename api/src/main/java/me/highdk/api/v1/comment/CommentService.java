@@ -160,7 +160,22 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 								.collect(Collectors.toList());
 	}
 
-	
+	public String deleteOne(Long id) {
+		return commentRepository.findById(id).map(comment -> {
+													/**
+													 *  1. comment 내에 포함된 해시태그를 긁어와, 댓글과 관련한 해시태그 처리 => ?
+													 *  2. parent 댓글인 경우, children 댓글 연쇄 삭제 => ?
+													 *  3. post의 댓글 수 조정 => 트리거
+													 *  4. 본인 삭제.
+													 * */
+													int affectedRowCount = commentRepository.deleteByParentId(id);
+													affectedRowCount = commentRepository.deleteById(id);
+													return "성공적으로 삭제되었습니다.";
+											 })
+											 .orElseThrow(() -> {
+													throw new CommentNotFoundException(id);
+											 });
 
+	}
 	
 }
