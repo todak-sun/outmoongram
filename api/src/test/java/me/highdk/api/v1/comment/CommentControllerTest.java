@@ -2,6 +2,7 @@ package me.highdk.api.v1.comment;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -287,6 +288,20 @@ class CommentControllerTest {
 			;
 	}
 	
+	@Test
+	@DisplayName(value = "댓글 정상 삭제")
+	public void delete_success() throws Exception {
+		//TODO: 댓글 삭제 시 고려해야할 것 모두 적용 후, 테스트코드도 다시 짤 것.
+		this.mvc.perform(delete("/v1/api/comments/1"))
+					.andExpect(status().isOk());
+	}
+	
+	@Test
+	@DisplayName(value = "존재하지 않는 댓글을 삭제시도")
+	public void delete_fail() throws Exception{
+		this.mvc.perform(delete("/v1/api/comments/99999999999"))
+					.andExpect(status().isNotFound());
+	}
 	
 	//TODO: SYJ, 테스트 자동화를 위한 데이터 생성/삭제 코드가 필요함. 추가할 것!
 }

@@ -23,4 +23,8 @@ public interface CommentDao {
 
 	public int update(Comment comment);
 
+	public int deleteById(Long id);
+
+	public int deleteByParentId(Long id);
+
 }

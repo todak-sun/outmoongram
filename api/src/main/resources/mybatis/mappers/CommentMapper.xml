@@ -110,4 +110,12 @@
 		WHERE
 			ID = #{id};
 	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		DELETE 
+		FROM 
+			OUTMOON_CMT
+		WHERE
+			ID = #{id};
+	</delete>
 </mapper>
