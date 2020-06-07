@@ -6,7 +6,7 @@ import me.highdk.api.v1.error.ErrorDto;
 
 public class PostNotFoundException extends NotFoundException {
 
-//	TODO: 이게 뭔지 질문..
+	//TODO: 이게 뭔지 질문..
 	private static final long serialVersionUID = 4252756064742917859L;
 	
 	@Getter

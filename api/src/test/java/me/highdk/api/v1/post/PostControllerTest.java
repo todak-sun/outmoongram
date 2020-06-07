@@ -43,7 +43,7 @@ class PostControllerTest {
 				.build();
 	}
 
-//	@Test
+	@Test
 	@DisplayName("생성 테스트")
 	public void createTest() throws Exception {
 		
@@ -63,7 +63,7 @@ class PostControllerTest {
 				.andExpect(header().exists("Location"));
 	}
 	
-//	@Test
+	@Test
 	@DisplayName("하나 읽기 테스트")
 	public void readOneTest() throws Exception{
 		
@@ -72,7 +72,16 @@ class PostControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("id").exists())
 				.andExpect(jsonPath("_links.self").exists());
+	}
+	
+	@Test
+	@DisplayName("없는 포스트 읽어오는 테스트")
+	public void readOneWithNotExistedPostId() throws Exception {
 		
+		this.mvc.perform(get("/v1/api/posts/1")
+				.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("rejectedValue").exists());
 	}
 	
 	@Test

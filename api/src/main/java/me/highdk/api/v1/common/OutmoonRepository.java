@@ -2,10 +2,10 @@ package me.highdk.api.v1.common;
 
 import java.util.Optional;
 
-public interface OutmoonRepository<T, S>{
+public interface OutmoonRepository<T, Entity>{
 	
-	public S save(S resource);
+	public Entity save(Entity resource);
 	
-	public Optional<S> findById(T id);
+	public Optional<Entity> findById(T id);
 	
 }

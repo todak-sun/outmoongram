@@ -19,12 +19,12 @@ public class OutmoonControllerAdvice {
 		this.errorService = errorService;
 	}
 	
-	@ExceptionHandler(NotFoundException.class)
-	public ResponseEntity<?> notFound(NotFoundException exception) {
-		return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(exception.getId());
-	}
+//	@ExceptionHandler(NotFoundException.class)
+//	public ResponseEntity<?> notFound(NotFoundException exception) {
+//		return ResponseEntity
+//					.status(HttpStatus.NOT_FOUND)
+//					.body(exception.getId());
+//	}
 	
 	@ExceptionHandler(ConnectException.class)
 	public ResponseEntity<?> couldNotConnectDatabase(){
