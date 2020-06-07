@@ -50,6 +50,16 @@ public class CommentRepository implements OutmoonRepository<Long, Comment>{
 	public Long countsByPostId(Long postId) {
 		return commentDao.countsByPostId(postId);
 	}
+
+
+	public int deleteById(Long id) {
+		return commentDao.deleteById(id);
+	}
+
+
+	public int deleteByParentId(Long id) {
+		return commentDao.deleteByParentId(id);
+	}
 	
 	
 	
