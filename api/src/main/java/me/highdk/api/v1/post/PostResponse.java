@@ -1,6 +1,9 @@
 package me.highdk.api.v1.post;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.hateoas.RepresentationModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import me.highdk.api.v1.comment.CommentResponse;
 
 @Getter
 @Setter
@@ -17,7 +21,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class PostResponse {
+public class PostResponse extends RepresentationModel<PostResponse> {
 	
 	private Long id;
 
@@ -32,6 +36,8 @@ public class PostResponse {
 	private Integer commentCnt;
 	
 	private Long writerId;
+	
+	private List<CommentResponse> comments; 
 	
 	
 }
