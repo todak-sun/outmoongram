@@ -54,9 +54,9 @@ class CommentControllerTest {
 	public void create_success() throws Exception {
 		
 		CommentRequest request = CommentRequest.builder()
-				.parentId(1L)
+				.parentId(0L)
 				.content("댓글 테스트입니다...")
-				.postId(1L)
+				.postId(2L)
 				.writerId(1L)
 				.build();
 		
@@ -138,7 +138,7 @@ class CommentControllerTest {
 	@DisplayName(value = "start, size를 주지 않고 페이징")
 	public void get_with_paging_with_default() throws Exception {
 		this.mvc.perform(get("/v1/api/comments")
-				.param("postId", "1"))
+				.param("postId", "2"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaTypes.HAL_JSON))
 			.andExpect(jsonPath("_embedded").exists())

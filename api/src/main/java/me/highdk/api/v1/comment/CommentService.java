@@ -19,16 +19,22 @@ import me.highdk.api.v1.common.OutmoonDetailService;
 import me.highdk.api.v1.common.PageDto;
 import me.highdk.api.v1.index.IndexController;
 import me.highdk.api.v1.post.PostController;
+import me.highdk.api.v1.post.PostNotFoundException;
+import me.highdk.api.v1.post.PostRepository;
 
 @Slf4j
 @Service
 public class CommentService implements OutmoonDetailService<Comment, CommentRequest, CommentResponse>{
 	
+	private final PostRepository postRespository;
+	
 	private final CommentRepository commentRepository;
 	
 	@Autowired
-	public CommentService(CommentRepository commentRepository) {
+	public CommentService(CommentRepository commentRepository,
+						  PostRepository postRepository) {
 		this.commentRepository = commentRepository;
+		this.postRespository = postRepository;
 	}
 	
 	@Override
@@ -58,48 +64,53 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 	}
 	
 	public PagedModel<CommentResponse> readPaged(Long postId, PageDto pageDto) {
-		
-		var comments = commentRepository.findByPostId(postId, pageDto);
-		
-		/**
-		 * 
-		 *  postId에 해당하는 모든 댓글 중에서
-		 *  자식 댓글이 아닌 모든 댓글을 담는다.
-		 *  
-		 * */
-		var parentComments = comments.stream()
-									 .filter(comment -> comment.getParentId() == 0)
-						   		  	 .collect(Collectors.toList());
-		
-		var responses = this.toResponse(parentComments);
-		
-		/**
-		 * 
-		 * parentComments만 담긴 응답용 객체를 순회하면서
-		 * 자식 댓글을 응답용 객체로 변환하여 내부에 담는다. 
-		 *  
-		 * */
-		responses.forEach(response -> {
-			var childrenComments = comments.stream()
-										   .filter(cmt -> response.getId() == cmt.getParentId())
-					  					   .collect(Collectors.toList());
-			response.setComments(this.toResponse(childrenComments));
-		});
-		
-		Long totalElements = commentRepository.countsByPostId(postId);
-		
-		PageMetadata metadata = new PageMetadata(comments.size(), pageDto.getPage(), totalElements);
-		
-		var resource = PagedModel.of(responses, metadata);
-		
-		//TODO: SYJ, @ReqeustParam 말고도 querystring 만드는 방법 찾아서 적용 할 것...
-		Link indexLink = linkTo(methodOn(IndexController.class).index()).withRel("index");
-		Link selfLink = linkTo(methodOn(CommentController.class).readWithPaged(postId, pageDto)).withSelfRel();
-		Link nextLink = linkTo(methodOn(CommentController.class).readWithPaged(postId, new PageDto(pageDto.getStart() + pageDto.getSize(), pageDto.getSize()))).withRel("next").expand(pageDto);
-		resource.add(indexLink);
-		resource.add(selfLink);
-		resource.add(nextLink);
-		return resource;
+		return postRespository.findById(postId)
+							  .map(post -> {
+									var comments = commentRepository.findByPostId(postId, pageDto);
+									
+									/**
+									 * 
+									 *  postId에 해당하는 모든 댓글 중에서
+									 *  자식 댓글이 아닌 모든 댓글을 담는다.
+									 *  
+									 * */
+									var parentComments = comments.stream()
+																 .filter(comment -> comment.getParentId() == 0)
+													   		  	 .collect(Collectors.toList());
+									
+									var responses = this.toResponse(parentComments);
+									
+									/**
+									 * 
+									 * parentComments만 담긴 응답용 객체를 순회하면서
+									 * 자식 댓글을 응답용 객체로 변환하여 내부에 담는다. 
+									 *  
+									 * */
+									responses.forEach(response -> {
+										var childrenComments = comments.stream()
+																	   .filter(cmt -> response.getId() == cmt.getParentId())
+												  					   .collect(Collectors.toList());
+										response.setComments(this.toResponse(childrenComments));
+									});
+									
+									Long totalElements = commentRepository.countsByPostId(postId);
+									
+									PageMetadata metadata = new PageMetadata(comments.size(), pageDto.getPage(), totalElements);
+									
+									var resource = PagedModel.of(responses, metadata);
+									
+									//TODO: SYJ, @ReqeustParam 말고도 querystring 만드는 방법 찾아서 적용 할 것...
+									Link indexLink = linkTo(methodOn(IndexController.class).index()).withRel("index");
+									Link selfLink = linkTo(methodOn(PostController.class).readCommentsByPostId(postId, pageDto)).withSelfRel();
+									Link nextLink = linkTo(methodOn(PostController.class).readCommentsByPostId(postId, new PageDto(pageDto.getStart() + pageDto.getSize(), pageDto.getSize()))).withRel("next").expand(pageDto);
+									resource.add(indexLink);
+									resource.add(selfLink);
+									resource.add(nextLink);
+									return resource;
+								})
+							    .orElseThrow(() -> {
+							    	throw new PostNotFoundException(postId);
+							    });
 	}	
 	
 	@Transactional
