@@ -3,6 +3,7 @@ package me.highdk.api.v1.image;
 import javax.validation.Valid;
 
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -29,10 +30,14 @@ public class ImageController {
 	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<?> readOne(@PathVariable Long id){
-		byte[] image = imageService.readOne(id);
+		ImageResponse response = imageService.display(id);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE, response.getMimeType());
+		
 		return ResponseEntity.status(HttpStatus.OK)
-							 .header("Content-Type", "image/jpeg")
-							 .body(image);
+							 .headers(headers)
+							 .body(response.getSerializedImage());
 	}
 	
 	@PostMapping

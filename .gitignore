@@ -10,3 +10,5 @@ api/src/main/resources/application.properties
 
 /nogit/*
 .DS_Store
+
+auth
