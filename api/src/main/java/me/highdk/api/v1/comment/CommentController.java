@@ -54,18 +54,6 @@ public class CommentController {
 				.body(resource);
 	}
 	
-	@GetMapping
-	public ResponseEntity<?> readWithPaged(	@RequestParam(required = true)  Long postId,
-											PageDto pageDto){
-		log.info("/v1/api/comments");
-		log.debug("Post Id is : {}, Page Information : {}", postId, pageDto);
-		
-		PagedModel<CommentResponse> resource = commentService.readPaged(postId, pageDto);
-		
-		return ResponseEntity.status(HttpStatus.OK)
-							 .body(resource);
-	}
-	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> readOne(@PathVariable Long id){
 		log.info("id : {}", id);

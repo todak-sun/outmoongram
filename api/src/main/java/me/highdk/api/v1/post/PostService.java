@@ -44,51 +44,19 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 		
 		return resource;
 	}	
-	
-//	public EntityModel<PostResponse> createPost(PostRequest request) {
-//		log.info("request : {}", request);
-//		Post newPost = parseTo(request);
-//		log.info("newPost : {}", newPost);
-//		Post savedPost = postRepository.save(newPost);
-//		
-//		Long id = savedPost.getId();
-//		String content = savedPost.getContent();
-//		LocalDateTime updatedAt = savedPost.getUpdatedAt();
-//		LocalDateTime writtenAt = savedPost.getWrittenAt();
-//		Integer likeCnt = savedPost.getLikeCnt();
-//		Integer commentCnt = savedPost.getCommentCnt();
-//		Long writerId = savedPost.getWriterId();
-//		
-//		PostResponse response = PostResponse.builder()
-//					.id(id)
-//					.content(content)
-//					.updatedAt(updatedAt)
-//					.writtenAt(writtenAt)
-//					.likeCnt(likeCnt)
-//					.commentCnt(commentCnt)
-//					.writerId(writerId)
-//					.build();
-//		
-//		EntityModel<PostResponse> resource = EntityModel.of(response);
-//		resource.add(linkTo(PostController.class).slash(response.getId()).withSelfRel());
-//		return resource;
-//	}
 
 	public EntityModel<PostResponse> readOne(Long postId){
 		return postRepository.findById(postId)
 				.map(post ->{
-					
-//					log.info("======= > service " + post);
-					
-		//			TODO: HJH; methodOn API 확인
+					//TODO: HJH; methodOn API 확인
 					var resource = this.toResource(this.toResponse(post));
 					resource.add(linkTo(methodOn(PostController.class).readOne(postId)).withSelfRel());
 					return resource;
-		})
-		.orElseThrow(() ->{
-			log.info("NotFoundException: {}", postId);
-			throw new PostNotFoundException(postId);
-		});
+				})
+				.orElseThrow(() ->{
+					log.info("NotFoundException: {}", postId);
+					throw new PostNotFoundException(postId);
+				});
 		
 	}
 	
