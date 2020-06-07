@@ -50,4 +50,27 @@
 		WHERE
 			ID = #{id};
 	</select>
+	
+	<select id="findAll" resultType="me.highdk.api.v1.post.Post">
+		SELECT 
+			id,
+			content,
+			written_at ,
+			updated_at ,
+			like_cnt ,
+			comment_cnt ,
+			is_used ,
+			writer_id 
+		FROM outmoon_post
+		ORDER BY ID
+		OFFSET ${pageDto.start}
+		LIMIT ${pageDto.size};
+	</select>
+	
+	<select id="countTotal" resultType="java.lang.Long">
+		SELECT 
+			COUNT(*)
+		FROM outmoon_post;
+	</select>
+	
 </mapper>
