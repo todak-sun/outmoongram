@@ -1,14 +1,18 @@
 package me.highdk.api.v1.post;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,7 +43,8 @@ class PostControllerTest {
 				.build();
 	}
 
-	@Test
+//	@Test
+	@DisplayName("생성 테스트")
 	public void createTest() throws Exception {
 		
 		PostRequest request = PostRequest.builder()
@@ -56,6 +61,29 @@ class PostControllerTest {
 				.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated())
 				.andExpect(header().exists("Location"));
+	}
+	
+//	@Test
+	@DisplayName("하나 읽기 테스트")
+	public void readOneTest() throws Exception{
+		
+		this.mvc.perform(get("/v1/api/posts/1")
+				.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("id").exists())
+				.andExpect(jsonPath("_links.self").exists());
+		
+	}
+	
+	@Test
+	@DisplayName("페이징 여러개 읽기 테스트")
+	public void readWithPagedTest() throws Exception{
+		
+		this.mvc.perform(get("/v1/api/posts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("start", "0")
+				.param("size", "5"))
+				.andExpect(status().isOk());
 	}
 
 }
