@@ -27,5 +27,9 @@ public class ImageRepository {
 	public Optional<Image> findById(Long id) {
 		return imageDao.findById(id);
 	}
+
+	public int deleteById(Long id) {
+		return imageDao.deleteById(id);
+	}
 	
 }

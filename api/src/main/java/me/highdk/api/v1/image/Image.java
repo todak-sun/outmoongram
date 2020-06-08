@@ -21,5 +21,7 @@ public class Image {
 	
 	private String name;
 	
+	private String mimeType;
+	
 	private String filePath;
 }
