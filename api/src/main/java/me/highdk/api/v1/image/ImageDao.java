@@ -16,4 +16,6 @@ public interface ImageDao {
 	
 	public int createLinkWithPost(@Param(value = "postId") Long postId, 
 								  @Param(value = "imageId") Long imageId);
+
+	public int deleteById(Long id);
 }

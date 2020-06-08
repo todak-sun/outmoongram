@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ public class ImageService implements OutmoonService<Image, ImageResponse>{
 	
 	private final ImageRepository imageRepository;
 	
+	@Autowired
 	public ImageService(ImageRepository imageRepository,
 						AppProperties appProperties) {
 		this.imageRepository = imageRepository;
@@ -80,6 +82,7 @@ public class ImageService implements OutmoonService<Image, ImageResponse>{
 													 .build());
 				}
 			} catch (IOException e) {
+				//TODO : SYJ, 에러처리 조금 더 고민.
 				e.printStackTrace();
 			}		
 		});
@@ -104,8 +107,8 @@ public class ImageService implements OutmoonService<Image, ImageResponse>{
 										   });
 	}
 	
-	private String makeImageFileName(String type) {
-		return "om_" + Calendar.getInstance().getTimeInMillis() + "." + type;
+	private String makeImageFileName(String ext) {
+		return "om_" + Calendar.getInstance().getTimeInMillis() + "." + ext;
 	}
 	
 	private File getFolder() {
@@ -145,6 +148,18 @@ public class ImageService implements OutmoonService<Image, ImageResponse>{
 	@Override
 	public List<ImageResponse> toResponse(List<Image> images) {
 		return images.stream().map(this::toResponse).collect(Collectors.toList());
+	}
+	
+	//TODO: SYJ, 나중에 한 번에 구현.
+	public String deleteOne(Long id) {
+		return imageRepository.findById(id).map(image -> {
+											   int affectedRowCount = imageRepository.deleteById(id);											   
+											   return "정상적으로 삭제하였습니다.";
+										   })
+										   .orElseThrow(() -> {
+											   throw new NotFoundException(id);
+										   }); 
+		
 	}
 
 	
