@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.highdk.api.v1.comment.CommentResponse;
 import me.highdk.api.v1.comment.CommentService;
 import me.highdk.api.v1.common.PageDto;
+import me.highdk.api.v1.hashtag.HashtagService;
 
 @RestController
 @Slf4j
@@ -35,12 +36,16 @@ public class PostController {
 	
 	private final CommentService commentService;
 	
+	private final HashtagService hashtagService;
+	
 //	생성자 D.I
 	@Autowired
 	public PostController(PostService postService,
-						  CommentService commentService) {
+						  CommentService commentService,
+						  HashtagService hashtagService) {
 		this.postService = postService;
 		this.commentService = commentService;
+		this.hashtagService = hashtagService;
 	}
 	
 	//TODO: HJH; validation & exception 처리할 것

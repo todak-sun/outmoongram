@@ -6,6 +6,105 @@ DROP TRIGGER IF EXISTS TRIGGER_POST_COMMENT_CNT ON PUBLIC.OUTMOON_CMT;
 DROP FUNCTION IF EXISTS PUBLIC.POST_COMMENT_CNT();
 DROP TRIGGER IF EXISTS TRIGGER_USER_POST_CNT ON PUBLIC.OUTMOON_POST;
 DROP FUNCTION IF EXISTS PUBLIC.USER_POST_CNT();
+DROP TRIGGER IF EXISTS TRIGGER_POST_HASHTAG_USED_CNT ON PUBLIC.OUTMOON_LINK_POST_HASH;
+DROP FUNCTION IF EXISTS POST_HASHTAG_USED_CNT();
+DROP TRIGGER IF EXISTS TRIGGER_CMT_HASHTAG_USED_CNT ON PUBLIC.OUTMOON_LINK_CMT_HASH ;
+DROP FUNCTION IF EXISTS CMT_HASHTAG_USED_CNT();
+
+DROP FUNCTION IF EXISTS public.tagging_post(_varchar,int8);
+DROP FUNCTION IF EXISTS public.tagging_cmt(_varchar,int8);
+
+--해쉬태그_POST 처리하는 procedure
+CREATE OR REPLACE FUNCTION tagging_post(varchar[], BIGINT) RETURNS INTEGER AS $TAGGING_POST$
+DECLARE 
+	a_tags 	ALIAS FOR $1;
+	a_post_id ALIAS FOR $2;
+	v_val	VARCHAR;
+	v_id	BIGINT;
+	result int := 0;
+	
+BEGIN 
+	FOREACH v_val IN ARRAY a_tags
+	LOOP
+		SELECT id INTO v_id
+			FROM outmoon_hashtag
+			WHERE tag = v_val;
+		IF(v_id IS NOT NULL) THEN 
+			RAISE NOTICE 'v_val: %', v_val;
+			RAISE NOTICE 'v_id: %', v_id;
+		ELSE
+			INSERT INTO outmoon_hashtag (
+				tag
+			)values(
+				v_val
+			);
+		
+			SELECT currval(pg_get_serial_sequence('outmoon_hashtag','id')) INTO v_id;	
+		
+			RAISE NOTICE 'v_val: %', v_val;
+			RAISE NOTICE 'v_id: %', v_id;
+			
+		END IF;
+	
+		INSERT INTO outmoon_link_post_hash (
+				post_id,
+				tag_id
+			)VALUES(
+				a_post_id,
+				v_id
+			);
+		RESULT := RESULT + 1;
+	
+	END LOOP;
+	RETURN RESULT;
+END;
+$TAGGING_POST$ LANGUAGE PLPGSQL;
+
+--해쉬태그_POST 처리하는 procedure
+CREATE OR REPLACE FUNCTION tagging_cmt(varchar[], BIGINT) RETURNS INTEGER AS $TAGGING_CMT$
+DECLARE 
+	a_tags 	ALIAS FOR $1;
+	a_cmt_id ALIAS FOR $2;
+	v_val	VARCHAR;
+	v_id	BIGINT;
+	result int := 0;
+	
+BEGIN 
+	FOREACH v_val IN ARRAY a_tags
+	LOOP
+		SELECT id INTO v_id
+			FROM outmoon_hashtag
+			WHERE tag = v_val;
+		IF(v_id IS NOT NULL) THEN 
+			RAISE NOTICE 'v_val: %', v_val;
+			RAISE NOTICE 'v_id: %', v_id;
+		ELSE
+			INSERT INTO outmoon_hashtag (
+				tag
+			)values(
+				v_val
+			);
+		
+			SELECT currval(pg_get_serial_sequence('outmoon_hashtag','id')) INTO v_id;	
+		
+			RAISE NOTICE 'v_val: %', v_val;
+			RAISE NOTICE 'v_id: %', v_id;
+			
+		END IF;
+	
+		INSERT INTO outmoon_link_cmt_hash (
+				cmt_id,
+				tag_id
+			)VALUES(
+				a_cmt_id,
+				v_id
+			);
+		RESULT := RESULT + 1;
+	
+	END LOOP;
+	RETURN RESULT;
+END;
+$TAGGING_CMT$ LANGUAGE PLPGSQL;
 
 
 --POST에 대한 좋아요 트리거 함수 
@@ -69,8 +168,6 @@ BEGIN
 
 	RETURN NULL;
 END;
-
-
 $TRIGGER_CMT_LIKE_CNT$ LANGUAGE PLPGSQL;
 
 
@@ -178,6 +275,64 @@ BEGIN
 END;
 $TRIGGER_USER_POST_CNT$ LANGUAGE PLPGSQL;
 
+--link_post_hash에 대한 tag_cnt 트리거 함수
+CREATE OR REPLACE FUNCTION POST_HASHTAG_USED_CNT() RETURNS TRIGGER AS $TRIGGER_POST_HASHTAG_USED_CNT$
+DECLARE count INT;
+
+BEGIN
+	IF(TG_OP = 'INSERT') THEN
+		SELECT COUNT(*) INTO count
+			FROM outmoon_link_post_hash
+			WHERE tag_id = NEW.tag_id;
+		
+		UPDATE outmoon_hashtag 
+			SET used_cnt = count
+			WHERE id = NEW.tag_id;
+		RETURN NEW;
+	
+	ELSEIF(TG_OP = "DELETE") THEN
+		SELECT COUNT(*) INTO count
+			FROM outmoon_link_post_hash
+			WHERE tag_id = OLD.tag_id;
+		
+		UPDATE outmoon_hashtag 
+			SET used_cnt = count
+			WHERE id = OLD.tag_id;
+		RETURN OLD;
+	END IF;
+	RETURN NULL;
+END;
+$TRIGGER_POST_HASHTAG_USED_CNT$ LANGUAGE PLPGSQL;
+
+--link_cmt_hash에 대한 tag_cnt 트리거 함수
+CREATE OR REPLACE FUNCTION CMT_HASHTAG_USED_CNT() RETURNS TRIGGER AS $TRIGGER_CMT_HASHTAG_USED_CNT$
+DECLARE count INT;
+
+BEGIN
+	IF(TG_OP = 'INSERT') THEN
+		SELECT COUNT(*) INTO count
+			FROM outmoon_link_cmt_hash 
+			WHERE tag_id = NEW.tag_id;
+		
+		UPDATE outmoon_hashtag 
+			SET used_cnt = count
+			WHERE id = NEW.tag_id;
+		RETURN NEW;
+	
+	ELSEIF(TG_OP = "DELETE") THEN
+		SELECT COUNT(*) INTO count
+			FROM outmoon_link_cmt_hash 
+			WHERE tag_id = OLD.tag_id;
+		
+		UPDATE outmoon_hashtag 
+			SET used_cnt = count
+			WHERE id = OLD.tag_id;
+		RETURN OLD;
+	END IF;
+	RETURN NULL;
+END;
+$TRIGGER_CMT_HASHTAG_USED_CNT$ LANGUAGE PLPGSQL;
+
 --트리거 생성
 CREATE TRIGGER TRIGGER_POST_LIKE_CNT
 	AFTER INSERT OR UPDATE OR DELETE 
@@ -189,16 +344,22 @@ CREATE TRIGGER TRIGGER_CMT_LIKE_CNT
 	ON OUTMOON_CMT_LIKE
 	FOR EACH  ROW EXECUTE PROCEDURE CMT_LIKE_CNT();
 
-CREATE TRIGGER TRIGGER_POST_COMMENT_CNT AFTER
-INSERT
-	OR
-UPDATE
-	OR
-DELETE
-	ON
-	OUTMOON_CMT FOR EACH ROW EXECUTE PROCEDURE POST_COMMENT_CNT();
+CREATE TRIGGER TRIGGER_POST_COMMENT_CNT
+	AFTER INSERT OR UPDATE OR DELETE
+	ON OUTMOON_CMT 
+	FOR EACH ROW EXECUTE PROCEDURE POST_COMMENT_CNT();
 
 CREATE TRIGGER TRIGGER_USER_POST_CNT
 	AFTER INSERT OR UPDATE OR DELETE 
 	ON OUTMOON_POST
 	FOR EACH  ROW EXECUTE PROCEDURE USER_POST_CNT();
+	
+CREATE TRIGGER TRIGGER_POST_HASHTAG_USED_CNT
+	AFTER INSERT OR UPDATE OR DELETE 
+	ON OUTMOON_LINK_POST_HASH
+	FOR EACH  ROW EXECUTE PROCEDURE POST_HASHTAG_USED_CNT();
+
+CREATE TRIGGER TRIGGER_CMT_HASHTAG_USED_CNT
+	AFTER INSERT OR UPDATE OR DELETE 
+	ON OUTMOON_LINK_CMT_HASH
+	FOR EACH  ROW EXECUTE PROCEDURE CMT_HASHTAG_USED_CNT();

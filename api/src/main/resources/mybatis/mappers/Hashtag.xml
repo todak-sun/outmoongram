@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.highdk.api.v1.hashtag.HashtagDao">
+	<select id="findByTag" parameterType="java.lang.String" resultType="java.lang.Long">
+		SELECT id
+		FROM outmoon_hashtag
+		WHERE tag = #{tag};
+	</select>
+	
+	<select id="findAllTagsByKeyword" parameterType="java.lang.String" resultType="me.highdk.api.v1.hashtag.Hashtag">
+		SELECT 	id,
+				tag,
+				used_cnt 
+		FROM
+			outmoon_hashtag
+		WHERE 
+			tag like '%' ||  #{keyword} || '%'
+		ORDER BY used_cnt DESC;
+	</select>
+	
+	<!-- procedure 호출..  -->
+	<select id="taggingPost" resultType="int">
+		SELECT tagging_post(#{tags}, #{postId});
+	</select>
+	
+	<select id="taggingCmt" resultType="int">
+		SELECT tagging_cmt(#{tags}, #{cmtId});
+	</select>
+
+</mapper>
