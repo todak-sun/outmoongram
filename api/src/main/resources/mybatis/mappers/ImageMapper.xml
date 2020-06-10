@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.highdk.api.v1.image.ImageDao">
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="me.highdk.api.v1.image.Image">
+		INSERT
+			INTO
+			OUTMOON_IMAGE(
+				NAME, FILE_PATH, MIME_TYPE
+			)
+		VALUES(
+			 #{name}, #{filePath}, #{mimeType}
+			);
+	</insert>
+	
+	<select id="findById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.image.Image">
+		SELECT
+			ID, NAME, FILE_PATH, MIME_TYPE
+		FROM
+			OUTMOON_IMAGE
+		WHERE
+			ID = #{id};
+	</select>
+	
+	<select id="getById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.image.Image">
+		SELECT
+			ID, NAME, FILE_PATH, MIME_TYPE
+		FROM
+			OUTMOON_IMAGE
+		WHERE
+			ID = #{id};
+	</select>
+	
+	<insert id="createLinkWithPost">
+		INSERT 
+			INTO
+			OUTMOON_LINK_POST_IMAGE(
+				POST_ID, IMAGE_ID
+			)
+		VALUES(
+				#{postId}, #{imageId}
+			);
+	</insert>
+	
+	<delete id="deleteById">
+			
+	</delete>
+</mapper>
