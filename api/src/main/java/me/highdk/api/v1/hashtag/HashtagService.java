@@ -69,7 +69,6 @@ public class HashtagService implements OutmoonService<Hashtag, HashtagResponse> 
 //			정규식으로 한글, 숫자, 영어 아닌(^) 것들을 nullString으로 대체 그리고 소문자로 변환
 			String tag = matcher.group().replaceAll("[^가-힣0-9a-zA-Z]", "").toLowerCase();
 			
-			log.info("tag: {}", tag);
 			if(!tag.isEmpty()) {
 				for(String tagInList : parsedTags) {
 					if(tag.equals(tagInList)) {
@@ -82,6 +81,7 @@ public class HashtagService implements OutmoonService<Hashtag, HashtagResponse> 
 				}
 			}
 		}
+		log.info("===> Tags: {}", parsedTags);
 		return parsedTags.toArray(new String[parsedTags.size()]);
 	}
 

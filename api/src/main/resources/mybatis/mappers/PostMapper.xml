@@ -33,7 +33,8 @@
 		FROM
 			OUTMOON_POST
 		WHERE
-			ID = #{id};
+				ID = #{id}
+			AND is_used = TRUE;
 	</select>
 	
 	<select id="findById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.post.Post">
@@ -48,7 +49,8 @@
 		FROM
 			OUTMOON_POST
 		WHERE
-			ID = #{id};
+				ID = #{id}
+			AND is_used = TRUE;
 	</select>
 	
 	<select id="findAll" resultType="me.highdk.api.v1.post.Post">
@@ -62,6 +64,7 @@
 			is_used ,
 			writer_id 
 		FROM outmoon_post
+		WHERE  is_used = TRUE
 		ORDER BY ID
 		OFFSET ${pageDto.start}
 		LIMIT ${pageDto.size};
@@ -72,5 +75,18 @@
 			COUNT(*)
 		FROM outmoon_post;
 	</select>
+	
+	<update id="update" parameterType="me.highdk.api.v1.post.Post">
+		UPDATE	outmoon_post
+		SET		content = #{content},
+				updated_at = now()
+		WHERE	id = #{id};
+	</update>
+	
+	<update id="deleteByFlag">
+		UPDATE	outmoon_post 
+		SET		is_used = FALSE 
+		WHERE	id = #{postId};
+	</update>
 	
 </mapper>

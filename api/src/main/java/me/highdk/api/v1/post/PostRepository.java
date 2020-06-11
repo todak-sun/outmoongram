@@ -40,5 +40,22 @@ public class PostRepository implements OutmoonRepository<Long, Post>{
 		return postDao.countTotal();
 	}
 	
+	public Post updateOne(Post post) {
+		int updateResult =  postDao.update(post);
+		if(updateResult != 1) {
+			throw new RuntimeException();
+		}
+		return postDao.getById(post.getId());
+	}
+	
+	public int deleteByFlag(Long postId) {
+		int deletedResult = postDao.deleteByFlag(postId);
+		if(deletedResult != 1) {
+			throw new RuntimeException();
+		}
+		
+		return deletedResult;
+	}
+	
 
 }

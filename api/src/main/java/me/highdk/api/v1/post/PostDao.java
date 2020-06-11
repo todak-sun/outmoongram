@@ -23,4 +23,10 @@ public interface PostDao {
 	
 	public Long countTotal();
 	
+	public int update(Post post);
+	
+	public int deleteByFlag(Long postId);
+	
+	public int deleteForReal(Long postId);
+	
 }

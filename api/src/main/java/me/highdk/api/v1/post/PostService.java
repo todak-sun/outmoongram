@@ -3,15 +3,17 @@ package me.highdk.api.v1.post;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import me.highdk.api.v1.common.OutmoonDetailService;
@@ -60,20 +62,12 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 		
 	}
 	
-	public PagedModel<EntityModel<PostResponse>> readPaged(PageDto pageDto){
+	public PagedModel<PostResponse> readPaged(PageDto pageDto){
 		List<Post> posts = postRepository.findAll(pageDto); 
 		
 //		List<PostResponse> postResponses = this.toResponse(posts);
 		
-		List<EntityModel<PostResponse>> list =  posts.stream()
-				.map(postResponse -> {
-					
-					EntityModel<PostResponse> entityModel =  this.toResource(postResponse);
-					Link selfLink = linkTo(methodOn(PostController.class).readOne(postResponse.getId())).withSelfRel();
-					
-					entityModel.add(selfLink);
-					return entityModel;
-				}).collect(Collectors.toList());
+		List<PostResponse> list = this.toResponse(posts);
 		
 		log.info("===> list " + list);
 
@@ -81,9 +75,40 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 		
 		PageMetadata pageMetadata = new PageMetadata(list.size(), pageDto.getPage(), totalElements);
 		
-		PagedModel<EntityModel<PostResponse>> resource =  PagedModel.of(list, pageMetadata);
+		PagedModel<PostResponse> resource =  PagedModel.of(list, pageMetadata);
+		resource.add(linkTo(methodOn(PostController.class).readWithPaged(pageDto)).withSelfRel());
 		
 		return resource;
+	}
+	
+	@Transactional
+	public EntityModel<PostResponse> updateOne(Long postId, PostRequest postRequest){
+//		postId가 있는지 먼저 확인,, 후에 있다면 map 실행, 없다면 PostNotFoundExeption 던지기
+		return postRepository.findById(postId)
+				.map(post -> {
+					post.setContent(postRequest.getContent());
+			
+					EntityModel<PostResponse> resource = this.toResource(postRepository.updateOne(post));
+					resource.add(linkTo(methodOn(PostController.class).readOne(postId)).withSelfRel());
+			
+					return resource;
+			
+				}).orElseThrow(() ->{
+					throw new PostNotFoundException(postId);
+				});
+	}
+	
+	public Map<String, String> deleteByFlag(Long postId) {
+		return postRepository.findById(postId)
+					.map(post -> {
+						int deletedResult = postRepository.deleteByFlag(postId);
+						Map<String, String> messageMap = new HashMap<>();
+						messageMap.put("message", postId + "번 게시물이 성공적으로 삭제되었습니다.");
+						
+						return messageMap;
+					}).orElseThrow(() ->{
+						throw new PostNotFoundException(postId);
+					});
 	}
 	
 	
