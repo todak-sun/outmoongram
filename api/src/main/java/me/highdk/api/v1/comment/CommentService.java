@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import me.highdk.api.v1.index.IndexController;
 import me.highdk.api.v1.post.PostController;
 import me.highdk.api.v1.post.PostNotFoundException;
 import me.highdk.api.v1.post.PostRepository;
+import me.highdk.api.v1.user.UserResponse;
 
 @Slf4j
 @Service
@@ -145,7 +147,10 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 				.writtenAt(comment.getWrittenAt())
 				.updatedAt(comment.getUpdatedAt())
 				.postId(comment.getPostId())
-				.writerId(comment.getWriterId())
+				.writer(UserResponse.builder()
+									.id(comment.getWriter().getId())
+									.nickName(comment.getWriter().getNickName())
+									.build())
 				.build();
 	}
 
@@ -166,8 +171,10 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 
 	@Override
 	public List<CommentResponse> toResponse(List<Comment> comments) {
-		return comments.stream().map(this::toResponse)
-								.collect(Collectors.toList());
+		return Optional.ofNullable(comments).map(cmts -> cmts.stream()
+															  .map(this::toResponse).collect(Collectors.toList()))
+											.orElseGet(() -> null);
+		
 	}
 
 	public String deleteOne(Long id) {

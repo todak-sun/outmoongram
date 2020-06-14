@@ -56,6 +56,10 @@ public class PostRepository implements OutmoonRepository<Long, Post>{
 		
 		return deletedResult;
 	}
+
+	public List<Post> findAllWithFullResource(PageDto pageDto) {
+		return postDao.findAllWithFullResource(pageDto);
+	}
 	
 
 }

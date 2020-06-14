@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
+import me.highdk.api.v1.comment.CommentService;
 import me.highdk.api.v1.common.OutmoonDetailService;
 import me.highdk.api.v1.common.PageDto;
+import me.highdk.api.v1.common.enums.FetchType;
+import me.highdk.api.v1.image.ImageService;
+import me.highdk.api.v1.user.User;
+import me.highdk.api.v1.user.UserResponse;
 
 @Service
 @Slf4j
@@ -25,9 +31,17 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 
 	private final PostRepository postRepository;
 	
+	private final CommentService commentService;
+	
+	private final ImageService imageService;
+	
 	@Autowired
-	public PostService(PostRepository postRepository) {
+	public PostService(PostRepository postRepository, 
+					   CommentService commentService, 
+					   ImageService imageService) {
 		this.postRepository = postRepository;
+		this.commentService = commentService;
+		this.imageService = imageService;
 	}
 
 	@Override
@@ -38,10 +52,7 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 		Post savedPost = postRepository.save(newPost);
 		
 		EntityModel<PostResponse> resource = this.toResource(savedPost);
-//		var resource = this.toResource(savedPost);
-		//TODO: HJH; var에 대해 다시 찾아볼 것
 
-//		생성된 data 조회에 대한 link
 		resource.add(linkTo(PostController.class).slash(savedPost.getId()).withSelfRel());
 		
 		return resource;
@@ -50,7 +61,6 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 	public EntityModel<PostResponse> readOne(Long postId){
 		return postRepository.findById(postId)
 				.map(post ->{
-					//TODO: HJH; methodOn API 확인
 					var resource = this.toResource(this.toResponse(post));
 					resource.add(linkTo(methodOn(PostController.class).readOne(postId)).withSelfRel());
 					return resource;
@@ -63,18 +73,22 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 	}
 	
 	public PagedModel<PostResponse> readPaged(PageDto pageDto){
-		List<Post> posts = postRepository.findAll(pageDto); 
 		
-//		List<PostResponse> postResponses = this.toResponse(posts);
 		
-		List<PostResponse> list = this.toResponse(posts);
+		log.info("pageDto : {}, fetchType : {}", pageDto, pageDto.getFetchType());
+		List<Post> posts = null;
 		
-		log.info("===> list " + list);
-
+		if(pageDto.getFetchType().equals(FetchType.FULL)){
+			posts = postRepository.findAllWithFullResource(pageDto);
+		} else if (pageDto.getFetchType().equals(FetchType.ORIGIN)) {
+			posts = postRepository.findAll(pageDto);
+		}
+		
 		Long totalElements = postRepository.countTotal();
-		
-		PageMetadata pageMetadata = new PageMetadata(list.size(), pageDto.getPage(), totalElements);
-		
+
+		List<PostResponse> list = this.toResponse(posts);
+	
+		PageMetadata pageMetadata = new PageMetadata(list.size(), pageDto.getPage(), totalElements);	
 		PagedModel<PostResponse> resource =  PagedModel.of(list, pageMetadata);
 		resource.add(linkTo(methodOn(PostController.class).readWithPaged(pageDto)).withSelfRel());
 		
@@ -112,42 +126,53 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 	}
 	
 	
-	
-	
-//	functional Methods..----------------------------------------------------------
+	/**
+	 * 임시로 만든 메서드
+	 * 나중에 옮겨야 함.
+	 * */
+	public UserResponse toResponse(User user) {
+		return Optional.ofNullable(user).map(u -> UserResponse.builder()
+															  .id(u.getId())
+															  .nickName(u.getNickName())
+															  .userName(u.getUserName())
+															  .registeredAt(u.getRegisteredAt())
+															  .updatedAt(u.getUpdatedAt())
+															  .build())
+										.orElseGet(() -> null);
+	}
 	
 	@Override
-//	req DTO -> entity DTO
 	public Post toEntity(PostRequest request) {
 		return Post.builder()
-				.writerId(request.getWriterId())
-				.content(request.getContent())
-				.build();
+				   .writerId(request.getWriterId())
+				   .content(request.getContent())
+				   .build();
 	}
 
 	@Override
-//	entity DTO -> res DTO	단일
 	public PostResponse toResponse(Post post) {
+		log.info("post : {}", post);
 		return PostResponse.builder()
-				.id(post.getId())
-				.content(post.getContent())
-				.writtenAt(post.getWrittenAt())
-				.updatedAt(post.getUpdatedAt())
-				.likeCnt(post.getLikeCnt())
-				.commentCnt(post.getCommentCnt())
-				.writerId(post.getWriterId())
-				.build();
+						    .id(post.getId())
+							.content(post.getContent())
+							.writtenAt(post.getWrittenAt())
+							.updatedAt(post.getUpdatedAt())
+							.likeCnt(post.getLikeCnt())
+							.commentCnt(post.getCommentCnt())
+							.writer(this.toResponse(post.getWriter()))
+							.comments(commentService.toResponse(post.getComments()))
+							.images(imageService.toResponse(post.getImages()))
+							.build();
 	}
 
 	@Override
-//	entity DTO -> res DTO	여러개
 	public List<PostResponse> toResponse(List<Post> posts) {
 		return posts.stream()
 				.map(this::toResponse)
 				.collect(Collectors.toList());
 	}
 
-//	res DTO -> EntityModel wrapping
+	
 	public EntityModel<PostResponse> toResource(Post post){
 		return this.toResource(this.toResponse(post));
 	}

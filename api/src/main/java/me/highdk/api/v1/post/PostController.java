@@ -41,7 +41,6 @@ public class PostController {
 	
 	private final HashtagService hashtagService;
 	
-//	생성자 D.I
 	@Autowired
 	public PostController(PostService postService,
 						  CommentService commentService,
@@ -56,9 +55,6 @@ public class PostController {
 				 produces = MediaTypes.HAL_JSON_VALUE)
 	public ResponseEntity<?> createPost(@RequestBody @Valid PostRequest postRequest,
 										Errors errors) {
-		
-		log.info("/v1/api/post/");
-		
 		if(errors.hasErrors()) {
 			throw new PostBadRequestException(errors);
 		}
@@ -75,10 +71,7 @@ public class PostController {
 	
 	@GetMapping(value = "/{postId}",
 				produces = MediaTypes.HAL_JSON_VALUE)
-	public ResponseEntity<?> readOne(@PathVariable("postId") Long postId){
-		
-		log.info("/v1/api/post/" + postId);
-		
+	public ResponseEntity<?> readOne(@PathVariable("postId") Long postId ){
 		EntityModel<PostResponse> resource =  postService.readOne(postId);
 		
 		return ResponseEntity.status(HttpStatus.OK)
@@ -86,7 +79,7 @@ public class PostController {
 	}
 	
 	@GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-	public ResponseEntity<?> readWithPaged(PageDto pageDto){
+	public ResponseEntity<?> readWithPaged( PageDto pageDto ){
 		//TODO: HJH; comments 2개씩 담아주는 로직 필요
 		PagedModel<PostResponse> resource = postService.readPaged(pageDto);
 		

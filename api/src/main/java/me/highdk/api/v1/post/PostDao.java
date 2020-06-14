@@ -21,6 +21,8 @@ public interface PostDao {
 	
 	public List<Post> findAll(@Param("pageDto") PageDto pageDto);
 	
+	public List<Post> findAllWithFullResource(@Param("pageDto") PageDto pageDto);
+	
 	public Long countTotal();
 	
 	public int update(Post post);
@@ -28,5 +30,6 @@ public interface PostDao {
 	public int deleteByFlag(Long postId);
 	
 	public int deleteForReal(Long postId);
+
 	
 }

@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import me.highdk.api.v1.user.UserResponse;
 
 @Getter
 @Setter
@@ -38,10 +39,14 @@ public class CommentResponse extends RepresentationModel<CommentResponse> {
 	private Integer likeCnt;
 
 	private Integer commentCnt;
-
+	
+	@JsonInclude(value = Include.NON_NULL)
 	private Long postId;
 
-	private Long writerId;
+	private UserResponse writer;
+	
+//	private Long writerId;
+	
 	
 	@JsonInclude(Include.NON_EMPTY)
 	private List<CommentResponse> comments;

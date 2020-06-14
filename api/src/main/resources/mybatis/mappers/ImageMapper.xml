@@ -4,7 +4,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="me.highdk.api.v1.image.ImageDao">
-	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="me.highdk.api.v1.image.Image">
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="Image">
 		INSERT
 			INTO
 			OUTMOON_IMAGE(
@@ -15,7 +15,7 @@
 			);
 	</insert>
 	
-	<select id="findById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.image.Image">
+	<select id="findById" parameterType="Long" resultType="Image">
 		SELECT
 			ID, NAME, FILE_PATH, MIME_TYPE
 		FROM
@@ -24,7 +24,7 @@
 			ID = #{id};
 	</select>
 	
-	<select id="getById" parameterType="java.lang.Long" resultType="me.highdk.api.v1.image.Image">
+	<select id="getById" parameterType="Long" resultType="Image">
 		SELECT
 			ID, NAME, FILE_PATH, MIME_TYPE
 		FROM

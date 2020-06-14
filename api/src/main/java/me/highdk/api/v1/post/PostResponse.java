@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +18,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.highdk.api.v1.comment.CommentResponse;
+import me.highdk.api.v1.image.ImageResponse;
+import me.highdk.api.v1.user.UserResponse;
 
 @Getter
 @Setter
@@ -21,6 +28,7 @@ import me.highdk.api.v1.comment.CommentResponse;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Relation(collectionRelation = "posts")
 public class PostResponse extends RepresentationModel<PostResponse> {
 	
 	private Long id;
@@ -35,9 +43,14 @@ public class PostResponse extends RepresentationModel<PostResponse> {
 
 	private Integer commentCnt;
 	
-	private Long writerId;
+	@JsonInclude(value = Include.NON_NULL)
+	private UserResponse writer;
 	
+	@JsonInclude(value = Include.NON_EMPTY)
 	private List<CommentResponse> comments; 
+	
+	@JsonInclude(value = Include.NON_EMPTY)
+	private List<ImageResponse> images;
 	
 	
 }
