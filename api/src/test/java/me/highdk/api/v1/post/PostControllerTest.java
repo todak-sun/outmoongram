@@ -9,15 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.nio.charset.Charset;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -25,6 +27,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import me.highdk.api.v1.user.User;
+import me.highdk.api.v1.user.UserRepository;
 
 @SpringBootTest
 @Slf4j
@@ -35,6 +39,12 @@ class PostControllerTest {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private PostRepository postRepository;
 	
 	private MockMvc mvc;
 
@@ -50,20 +60,32 @@ class PostControllerTest {
 	@DisplayName("생성 테스트 & 해쉬태그")
 	public void createTest() throws Exception {
 		
+		User user = userRepository.create(User.builder()
+								  .userName("test@test.com")
+								  .nickName("testAccount")
+								  .password("1234")
+								  .build());
+		
 		PostRequest request = PostRequest.builder()
 				.content("오늘은 #날씨 가 #너무 덥죠.. #행복 #소!통 #%$맛집 #날씨 #맛집")
-				.writerId(1L)
+				.writerId(user.getId())
 				.build();
 		
-		String str = objectMapper.writeValueAsString(request);
-		
-		log.info("str : {}", str);
-		
-		this.mvc.perform(post("/v1/api/posts")
+		MvcResult result = this.mvc.perform(post("/v1/api/posts")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"));
+				.andExpect(header().exists("Location"))
+				.andExpect(jsonPath("id").exists())
+				.andReturn()
+				;
+		
+		String str = result.getResponse()
+						   .getContentAsString(Charset.forName("UTF-8"));
+		Post newPost = objectMapper.convertValue(str, Post.class);
+		
+		userRepository.deleteById(user.getId());
+		postRepository.deleteById(newPost.getId());
 	}
 	
 	@Test

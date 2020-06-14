@@ -31,5 +31,7 @@ public interface PostDao {
 	
 	public int deleteForReal(Long postId);
 
+	public int deleteById(Long id);
+
 	
 }

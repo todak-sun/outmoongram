@@ -29,5 +29,6 @@
 	<select id="taggingCmt" resultType="int">
 		SELECT tagging_cmt(#{tags}, #{cmtId});
 	</select>
+	
 
 </mapper>

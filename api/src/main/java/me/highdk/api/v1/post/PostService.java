@@ -6,7 +6,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,7 @@ import me.highdk.api.v1.common.OutmoonDetailService;
 import me.highdk.api.v1.common.PageDto;
 import me.highdk.api.v1.common.enums.FetchType;
 import me.highdk.api.v1.image.ImageService;
-import me.highdk.api.v1.user.User;
-import me.highdk.api.v1.user.UserResponse;
+import me.highdk.api.v1.user.UserService;
 
 @Service
 @Slf4j
@@ -35,13 +33,17 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 	
 	private final ImageService imageService;
 	
+	private final UserService userService;
+	
 	@Autowired
 	public PostService(PostRepository postRepository, 
 					   CommentService commentService, 
-					   ImageService imageService) {
+					   ImageService imageService,
+					   UserService userService) {
 		this.postRepository = postRepository;
 		this.commentService = commentService;
 		this.imageService = imageService;
+		this.userService = userService;
 	}
 
 	@Override
@@ -126,21 +128,6 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 	}
 	
 	
-	/**
-	 * 임시로 만든 메서드
-	 * 나중에 옮겨야 함.
-	 * */
-	public UserResponse toResponse(User user) {
-		return Optional.ofNullable(user).map(u -> UserResponse.builder()
-															  .id(u.getId())
-															  .nickName(u.getNickName())
-															  .userName(u.getUserName())
-															  .registeredAt(u.getRegisteredAt())
-															  .updatedAt(u.getUpdatedAt())
-															  .build())
-										.orElseGet(() -> null);
-	}
-	
 	@Override
 	public Post toEntity(PostRequest request) {
 		return Post.builder()
@@ -159,7 +146,7 @@ public class PostService implements OutmoonDetailService<Post, PostRequest, Post
 							.updatedAt(post.getUpdatedAt())
 							.likeCnt(post.getLikeCnt())
 							.commentCnt(post.getCommentCnt())
-							.writer(this.toResponse(post.getWriter()))
+							.writer(userService.toResponse(post.getWriter()))
 							.comments(commentService.toResponse(post.getComments()))
 							.images(imageService.toResponse(post.getImages()))
 							.build();
