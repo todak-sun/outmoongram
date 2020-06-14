@@ -16,4 +16,6 @@ public interface HashtagDao {
 	
 	public int taggingCmt(@Param("tags") String[] array, @Param("cmtId") Long cmtId);
 
+	public int deleteByPostId(Long postId);
+
 }

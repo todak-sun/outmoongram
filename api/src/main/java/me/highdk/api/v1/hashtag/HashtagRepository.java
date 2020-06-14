@@ -44,5 +44,9 @@ public class HashtagRepository implements OutmoonRepository<Long, Hashtag> {
 	public int taggingCmt(String[] array, Long cmtId) {
 		return hashtagDao.taggingCmt(array, cmtId);
 	}
+	
+	public int deleteByPostId(Long postId) {
+		return hashtagDao.deleteByPostId(postId);
+	}
 
 }

@@ -1,5 +1,6 @@
 package me.highdk.api.v1.post;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,8 +26,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import lombok.extern.slf4j.Slf4j;
+import me.highdk.api.v1.hashtag.HashtagRepository;
 import me.highdk.api.v1.user.User;
 import me.highdk.api.v1.user.UserRepository;
 
@@ -46,6 +51,9 @@ class PostControllerTest {
 	@Autowired
 	private PostRepository postRepository;
 	
+	@Autowired
+	private HashtagRepository hashtagRepository;
+	
 	private MockMvc mvc;
 
 	@BeforeEach
@@ -60,43 +68,86 @@ class PostControllerTest {
 	@DisplayName("생성 테스트 & 해쉬태그")
 	public void createTest() throws Exception {
 		
-		User user = userRepository.create(User.builder()
+		User user = userRepository.save(User.builder()
 								  .userName("test@test.com")
 								  .nickName("testAccount")
 								  .password("1234")
 								  .build());
 		
 		PostRequest request = PostRequest.builder()
-				.content("오늘은 #날씨 가 #너무 덥죠.. #행복 #소!통 #%$맛집 #날씨 #맛집")
-				.writerId(user.getId())
-				.build();
+										.content("오늘은 #날씨 가 #너무 덥죠.. #행복 #소!통 #%$맛집 #날씨 #맛집")
+										.writerId(user.getId())
+										.build();
 		
 		MvcResult result = this.mvc.perform(post("/v1/api/posts")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"))
-				.andExpect(jsonPath("id").exists())
-				.andReturn()
-				;
+								   .contentType(MediaType.APPLICATION_JSON)
+								   .content(objectMapper.writeValueAsString(request)))
+								   .andExpect(status().isCreated())
+								   .andExpect(header().exists("Location"))
+								   .andExpect(jsonPath("id").exists())
+								   .andExpect(jsonPath("content").exists())
+								   .andExpect(jsonPath("writtenAt").exists())
+								   .andExpect(jsonPath("updatedAt").exists())
+								   .andExpect(jsonPath("likeCnt").exists())
+								   .andExpect(jsonPath("commentCnt").exists())
+								   .andExpect(jsonPath("_links").exists())
+								   .andExpect(jsonPath("_links.index").exists())
+								   .andExpect(jsonPath("_links.self").exists())
+								   .andReturn()
+									;
 		
-		String str = result.getResponse()
-						   .getContentAsString(Charset.forName("UTF-8"));
-		Post newPost = objectMapper.convertValue(str, Post.class);
+		String jsonString = result.getResponse()
+						   		  .getContentAsString(Charset.forName("UTF-8"));
 		
+		log.info("str : {} ", jsonString);
+		
+		
+		JsonElement jsonElement = JsonParser.parseString(jsonString);
+		JsonObject json = jsonElement.getAsJsonObject();
+		Long postId = json.get("id").getAsLong();
+			
+		hashtagRepository.deleteByPostId(postId);
+		postRepository.deleteById(postId);
 		userRepository.deleteById(user.getId());
-		postRepository.deleteById(newPost.getId());
 	}
 	
 	@Test
 	@DisplayName("하나 읽기 테스트")
 	public void readOneTest() throws Exception{
 		
-		this.mvc.perform(get("/v1/api/posts/2")
+		User user = userRepository.save(User.builder()
+								  .userName("test@test.com")
+								  .nickName("testAccount")
+								  .password("1234")
+								  .build());
+		
+		Post post = postRepository.save(Post.builder()
+								  .content("content")
+								  .writerId(user.getId())
+								  .build());
+		
+		this.mvc.perform(get("/v1/api/posts/" + post.getId())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("id").exists())
+				.andExpect(jsonPath("id", is(post.getId().intValue())))
+				.andExpect(jsonPath("content").exists())
+				.andExpect(jsonPath("content", is(post.getContent())))
+				.andExpect(jsonPath("writtenAt").exists())
+				.andExpect(jsonPath("updatedAt").exists())
+				.andExpect(jsonPath("likeCnt").exists())
+			    .andExpect(jsonPath("commentCnt").exists())
+			    .andExpect(jsonPath("writer").exists())
+			    .andExpect(jsonPath("writer.id").exists())
+			    .andExpect(jsonPath("writer.id", is(user.getId().intValue())))
+			    .andExpect(jsonPath("writer.nickName").exists())
+			    .andExpect(jsonPath("writer.nickName", is(user.getNickName())))
+			    .andExpect(jsonPath("_links").exists())
+			    .andExpect(jsonPath("_links.index").exists())
 				.andExpect(jsonPath("_links.self").exists());
+		
+		postRepository.deleteById(post.getId());
+		userRepository.deleteById(user.getId());
 	}
 	
 	@Test

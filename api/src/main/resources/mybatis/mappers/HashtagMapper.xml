@@ -30,5 +30,13 @@
 		SELECT tagging_cmt(#{tags}, #{cmtId});
 	</select>
 	
+	<delete id="deleteByPostId" parameterType="Long">
+		DELETE
+			FROM
+			OUTMOON_LINK_POST_HASH
+		WHERE
+			POST_ID = #{postId}; 
+	</delete>
+	
 
 </mapper>

@@ -11,7 +11,7 @@ public class UserRepository {
 		this.userDao = userDao;
 	}
 	
-	public User create(User user) {
+	public User save(User user) {
 		int affectedRowCount = userDao.create(user);		
 		return userDao.getById(user.getId());
 	}

@@ -43,7 +43,7 @@
 	
 	<delete id="deleteById">
 		DELETE 
-			FROM USER
+			FROM OUTMOON_USER
 		WHERE ID = #{id};
 	</delete>
 </mapper>
