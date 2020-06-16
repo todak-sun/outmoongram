@@ -11,47 +11,47 @@ DROP FUNCTION IF EXISTS POST_HASHTAG_USED_CNT();
 DROP TRIGGER IF EXISTS TRIGGER_CMT_HASHTAG_USED_CNT ON PUBLIC.OUTMOON_LINK_CMT_HASH ;
 DROP FUNCTION IF EXISTS CMT_HASHTAG_USED_CNT();
 
-DROP FUNCTION IF EXISTS public.tagging_post(_varchar,int8);
-DROP FUNCTION IF EXISTS public.tagging_cmt(_varchar,int8);
+DROP FUNCTION IF EXISTS PUBLIC.TAGGING_POST(_VARCHAR, INT8);
+DROP FUNCTION IF EXISTS PUBLIC.TAGGING_CMT(_VARCHAR, INT8);
 
---해쉬태그_POST 처리하는 procedure
-CREATE OR REPLACE FUNCTION tagging_post(varchar[], BIGINT) RETURNS INTEGER AS $TAGGING_POST$
+--해쉬태그_POST 처리하는 PROCEDURE
+CREATE OR REPLACE FUNCTION TAGGING_POST(VARCHAR[], BIGINT) RETURNS INTEGER AS $TAGGING_POST$
 DECLARE 
-	a_tags 	ALIAS FOR $1;
-	a_post_id ALIAS FOR $2;
-	v_val	VARCHAR;
-	v_id	BIGINT;
-	result int := 0;
+	A_TAGS 	ALIAS FOR $1;
+	A_POST_ID ALIAS FOR $2;
+	V_VAL	VARCHAR;
+	V_ID	BIGINT;
+	RESULT INT := 0;
 	
 BEGIN 
-	FOREACH v_val IN ARRAY a_tags
+	FOREACH V_VAL IN ARRAY A_TAGS
 	LOOP
-		SELECT id INTO v_id
-			FROM outmoon_hashtag
-			WHERE tag = v_val;
-		IF(v_id IS NOT NULL) THEN 
-			RAISE NOTICE 'v_val: %', v_val;
-			RAISE NOTICE 'v_id: %', v_id;
+		SELECT ID INTO V_ID
+			FROM OUTMOON_HASHTAG
+			WHERE TAG = V_VAL;
+		IF(V_ID IS NOT NULL) THEN 
+			RAISE NOTICE 'V_VAL: %', V_VAL;
+			RAISE NOTICE 'V_ID: %', V_ID;
 		ELSE
-			INSERT INTO outmoon_hashtag (
-				tag
-			)values(
-				v_val
+			INSERT INTO OUTMOON_HASHTAG (
+				TAG
+			)VALUES(
+				V_VAL
 			);
 		
-			SELECT currval(pg_get_serial_sequence('outmoon_hashtag','id')) INTO v_id;	
+			SELECT CURRVAL(PG_GET_SERIAL_SEQUENCE('OUTMOON_HASHTAG','id')) INTO V_ID;	
 		
-			RAISE NOTICE 'v_val: %', v_val;
-			RAISE NOTICE 'v_id: %', v_id;
+			RAISE NOTICE 'V_VAL: %', V_VAL;
+			RAISE NOTICE 'V_ID: %', V_ID;
 			
 		END IF;
 	
-		INSERT INTO outmoon_link_post_hash (
-				post_id,
-				tag_id
+		INSERT INTO OUTMOON_LINK_POST_HASH (
+				POST_ID,
+				TAG_ID
 			)VALUES(
-				a_post_id,
-				v_id
+				A_POST_ID,
+				V_ID
 			);
 		RESULT := RESULT + 1;
 	
@@ -60,44 +60,44 @@ BEGIN
 END;
 $TAGGING_POST$ LANGUAGE PLPGSQL;
 
---해쉬태그_POST 처리하는 procedure
-CREATE OR REPLACE FUNCTION tagging_cmt(varchar[], BIGINT) RETURNS INTEGER AS $TAGGING_CMT$
+--해쉬태그_POST 처리하는 PROCEDURE
+CREATE OR REPLACE FUNCTION TAGGING_CMT(VARCHAR[], BIGINT) RETURNS INTEGER AS $TAGGING_CMT$
 DECLARE 
-	a_tags 	ALIAS FOR $1;
-	a_cmt_id ALIAS FOR $2;
-	v_val	VARCHAR;
-	v_id	BIGINT;
-	result int := 0;
+	A_TAGS 	ALIAS FOR $1;
+	A_CMT_ID ALIAS FOR $2;
+	V_VAL	VARCHAR;
+	V_ID	BIGINT;
+	RESULT INT := 0;
 	
 BEGIN 
-	FOREACH v_val IN ARRAY a_tags
+	FOREACH V_VAL IN ARRAY A_TAGS
 	LOOP
-		SELECT id INTO v_id
-			FROM outmoon_hashtag
-			WHERE tag = v_val;
-		IF(v_id IS NOT NULL) THEN 
-			RAISE NOTICE 'v_val: %', v_val;
-			RAISE NOTICE 'v_id: %', v_id;
+		SELECT ID INTO V_ID
+			FROM OUTMOON_HASHTAG
+			WHERE TAG = V_VAL;
+		IF(V_ID IS NOT NULL) THEN 
+			RAISE NOTICE 'V_VAL: %', V_VAL;
+			RAISE NOTICE 'V_ID: %', V_ID;
 		ELSE
-			INSERT INTO outmoon_hashtag (
-				tag
-			)values(
-				v_val
+			INSERT INTO OUTMOON_HASHTAG (
+				TAG
+			)VALUES(
+				V_VAL
 			);
 		
-			SELECT currval(pg_get_serial_sequence('outmoon_hashtag','id')) INTO v_id;	
+			SELECT CURRVAL(PG_GET_SERIAL_SEQUENCE('OUTMOON_HASHTAG','id')) INTO V_ID;	
 		
-			RAISE NOTICE 'v_val: %', v_val;
-			RAISE NOTICE 'v_id: %', v_id;
+			RAISE NOTICE 'V_VAL: %', V_VAL;
+			RAISE NOTICE 'V_ID: %', V_ID;
 			
 		END IF;
 	
-		INSERT INTO outmoon_link_cmt_hash (
-				cmt_id,
-				tag_id
+		INSERT INTO OUTMOON_LINK_CMT_HASH (
+				CMT_ID,
+				TAG_ID
 			)VALUES(
-				a_cmt_id,
-				v_id
+				A_CMT_ID,
+				V_ID
 			);
 		RESULT := RESULT + 1;
 	
@@ -275,58 +275,58 @@ BEGIN
 END;
 $TRIGGER_USER_POST_CNT$ LANGUAGE PLPGSQL;
 
---link_post_hash에 대한 tag_cnt 트리거 함수
+--LINK_POST_HASH에 대한 TAG_CNT 트리거 함수
 CREATE OR REPLACE FUNCTION POST_HASHTAG_USED_CNT() RETURNS TRIGGER AS $TRIGGER_POST_HASHTAG_USED_CNT$
-DECLARE count INT;
+DECLARE COUNT INT;
 
 BEGIN
 	IF(TG_OP = 'INSERT') THEN
-		SELECT COUNT(*) INTO count
-			FROM outmoon_link_post_hash
-			WHERE tag_id = NEW.tag_id;
+		SELECT COUNT(*) INTO COUNT
+			FROM OUTMOON_LINK_POST_HASH
+			WHERE TAG_ID = NEW.TAG_ID;
 		
-		UPDATE outmoon_hashtag 
-			SET used_cnt = count
-			WHERE id = NEW.tag_id;
+		UPDATE OUTMOON_HASHTAG 
+			SET USED_CNT = COUNT
+			WHERE ID = NEW.TAG_ID;
 		RETURN NEW;
 	
-	ELSEIF(TG_OP = "DELETE") THEN
-		SELECT COUNT(*) INTO count
-			FROM outmoon_link_post_hash
-			WHERE tag_id = OLD.tag_id;
+	ELSEIF(TG_OP = 'DELETE') THEN
+		SELECT COUNT(*) INTO COUNT
+			FROM OUTMOON_LINK_POST_HASH
+			WHERE TAG_ID = OLD.TAG_ID;
 		
-		UPDATE outmoon_hashtag 
-			SET used_cnt = count
-			WHERE id = OLD.tag_id;
+		UPDATE OUTMOON_HASHTAG 
+			SET USED_CNT = COUNT
+			WHERE ID = OLD.TAG_ID;
 		RETURN OLD;
 	END IF;
 	RETURN NULL;
 END;
 $TRIGGER_POST_HASHTAG_USED_CNT$ LANGUAGE PLPGSQL;
 
---link_cmt_hash에 대한 tag_cnt 트리거 함수
+--LINK_CMT_HASH에 대한 TAG_CNT 트리거 함수
 CREATE OR REPLACE FUNCTION CMT_HASHTAG_USED_CNT() RETURNS TRIGGER AS $TRIGGER_CMT_HASHTAG_USED_CNT$
-DECLARE count INT;
+DECLARE COUNT INT;
 
 BEGIN
 	IF(TG_OP = 'INSERT') THEN
-		SELECT COUNT(*) INTO count
-			FROM outmoon_link_cmt_hash 
-			WHERE tag_id = NEW.tag_id;
+		SELECT COUNT(*) INTO COUNT
+			FROM OUTMOON_LINK_CMT_HASH 
+			WHERE TAG_ID = NEW.TAG_ID;
 		
-		UPDATE outmoon_hashtag 
-			SET used_cnt = count
-			WHERE id = NEW.tag_id;
+		UPDATE OUTMOON_HASHTAG 
+			SET USED_CNT = COUNT
+			WHERE ID = NEW.TAG_ID;
 		RETURN NEW;
 	
-	ELSEIF(TG_OP = "DELETE") THEN
-		SELECT COUNT(*) INTO count
-			FROM outmoon_link_cmt_hash 
-			WHERE tag_id = OLD.tag_id;
+	ELSEIF(TG_OP = 'DELETE') THEN
+		SELECT COUNT(*) INTO COUNT
+			FROM OUTMOON_LINK_CMT_HASH 
+			WHERE TAG_ID = OLD.TAG_ID;
 		
-		UPDATE outmoon_hashtag 
-			SET used_cnt = count
-			WHERE id = OLD.tag_id;
+		UPDATE OUTMOON_HASHTAG 
+			SET USED_CNT = COUNT
+			WHERE ID = OLD.TAG_ID;
 		RETURN OLD;
 	END IF;
 	RETURN NULL;

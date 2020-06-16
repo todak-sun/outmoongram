@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import me.highdk.api.v1.index.IndexController;
 import me.highdk.api.v1.post.PostController;
 import me.highdk.api.v1.post.PostNotFoundException;
 import me.highdk.api.v1.post.PostRepository;
+import me.highdk.api.v1.user.UserResponse;
+import me.highdk.api.v1.user.UserService;
 
 @Slf4j
 @Service
@@ -30,11 +33,15 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 	
 	private final CommentRepository commentRepository;
 	
+	private final UserService userService;
+	
 	@Autowired
 	public CommentService(CommentRepository commentRepository,
-						  PostRepository postRepository) {
+						  PostRepository postRepository,
+						  UserService userService) {
 		this.commentRepository = commentRepository;
 		this.postRespository = postRepository;
+		this.userService = userService;
 	}
 	
 	@Override
@@ -68,30 +75,8 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 							  .map(post -> {
 									var comments = commentRepository.findByPostId(postId, pageDto);
 									
-									/**
-									 * 
-									 *  postId에 해당하는 모든 댓글 중에서
-									 *  자식 댓글이 아닌 모든 댓글을 담는다.
-									 *  
-									 * */
-									var parentComments = comments.stream()
-																 .filter(comment -> comment.getParentId() == 0)
-													   		  	 .collect(Collectors.toList());
+									var responses = this.toResponse(comments);
 									
-									var responses = this.toResponse(parentComments);
-									
-									/**
-									 * 
-									 * parentComments만 담긴 응답용 객체를 순회하면서
-									 * 자식 댓글을 응답용 객체로 변환하여 내부에 담는다. 
-									 *  
-									 * */
-									responses.forEach(response -> {
-										var childrenComments = comments.stream()
-																	   .filter(cmt -> response.getId() == cmt.getParentId())
-												  					   .collect(Collectors.toList());
-										response.setComments(this.toResponse(childrenComments));
-									});
 									
 									Long totalElements = commentRepository.countsByPostId(postId);
 									
@@ -145,7 +130,7 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 				.writtenAt(comment.getWrittenAt())
 				.updatedAt(comment.getUpdatedAt())
 				.postId(comment.getPostId())
-				.writerId(comment.getWriterId())
+				.writer(userService.toResponse(comment.getWriter()))
 				.build();
 	}
 
@@ -166,8 +151,38 @@ public class CommentService implements OutmoonDetailService<Comment, CommentRequ
 
 	@Override
 	public List<CommentResponse> toResponse(List<Comment> comments) {
-		return comments.stream().map(this::toResponse)
-								.collect(Collectors.toList());
+		return Optional.ofNullable(comments).map(cmts -> {
+											/**
+											 * 
+											 *  postId에 해당하는 모든 댓글 중에서
+											 *  자식 댓글이 아닌 모든 댓글을 담는다.
+											 *  
+											 * */
+											log.info("cmts : {}", cmts);
+											var parentComments = cmts.stream()
+																	 .filter(cmt -> cmt.getParentId() == 0)
+															   		 .collect(Collectors.toList());
+											
+											var responses = parentComments.stream()
+																		  .map(this::toResponse)
+																		  .collect(Collectors.toList());
+											/**
+											 * 
+											 * parentComments만 담긴 응답용 객체를 순회하면서
+											 * 자식 댓글을 응답용 객체로 변환하여 내부에 담는다. 
+											 *  
+											 * */
+											responses.forEach(response -> {
+												var childrenComments = cmts.stream()
+																		   .filter(cmt -> response.getId() == cmt.getParentId())
+														  				   .collect(Collectors.toList());
+												response.setComments(this.toResponse(childrenComments));
+											});
+											
+											return responses;
+											})
+											.orElseGet(() -> null);
+		
 	}
 
 	public String deleteOne(Long id) {

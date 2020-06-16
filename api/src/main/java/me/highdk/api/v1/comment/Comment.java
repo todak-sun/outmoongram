@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import me.highdk.api.v1.user.User;
 
 @Getter
 @Setter
@@ -36,5 +37,7 @@ public class Comment {
 	private Long postId;
 	
 	private Long writerId;
+	
+	private User writer;
 	
 }

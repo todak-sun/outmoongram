@@ -48,6 +48,10 @@ public class PostRepository implements OutmoonRepository<Long, Post>{
 		return postDao.getById(post.getId());
 	}
 	
+	public int deleteById(Long id) {
+		return postDao.deleteById(id);
+	}
+	
 	public int deleteByFlag(Long postId) {
 		int deletedResult = postDao.deleteByFlag(postId);
 		if(deletedResult != 1) {
@@ -55,6 +59,10 @@ public class PostRepository implements OutmoonRepository<Long, Post>{
 		}
 		
 		return deletedResult;
+	}
+
+	public List<Post> findAllWithFullResource(PageDto pageDto) {
+		return postDao.findAllWithFullResource(pageDto);
 	}
 	
 

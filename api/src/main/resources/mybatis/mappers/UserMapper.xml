@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.highdk.api.v1.user.UserDao">
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="User">
+		INSERT
+			INTO
+			OUTMOON_USER(USER_NAME, NICK_NAME, PASSWORD, REGISTERED_AT, UPDATED_AT)
+		VALUES (#{userName}, #{nickName}, #{password}, now(), now());
+	</insert>
+	
+	<select id="getById" parameterType="Long" resultType="User">
+		SELECT
+			ID,
+			USER_NAME,
+			NICK_NAME,
+			PASSWORD,
+			REGISTERED_AT,
+			UPDATED_AT,
+			POST_CNT
+		FROM
+			OUTMOON_USER
+		WHERE
+			ID = #{id};
+	</select>
+	
+	<select id="findById" parameterType="Long" resultType="User">
+		SELECT
+			ID,
+			USER_NAME,
+			NICK_NAME,
+			PASSWORD,
+			REGISTERED_AT,
+			UPDATED_AT,
+			POST_CNT
+		FROM
+			OUTMOON_USER
+		WHERE
+			ID = #{id};
+	</select>
+	
+	<delete id="deleteById">
+		DELETE 
+			FROM OUTMOON_USER
+		WHERE ID = #{id};
+	</delete>
+</mapper>

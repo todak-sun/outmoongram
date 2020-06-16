@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -147,7 +148,10 @@ public class ImageService implements OutmoonService<Image, ImageResponse>{
 
 	@Override
 	public List<ImageResponse> toResponse(List<Image> images) {
-		return images.stream().map(this::toResponse).collect(Collectors.toList());
+		return Optional.ofNullable(images).map(imgs -> imgs.stream()
+														   .map(this::toResponse).collect(Collectors.toList()))
+										  .orElseGet(() -> null);
+		
 	}
 	
 	//TODO: SYJ, 나중에 한 번에 구현.

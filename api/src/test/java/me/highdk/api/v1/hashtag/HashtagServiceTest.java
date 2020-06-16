@@ -43,7 +43,7 @@ class HashtagServiceTest {
 	}
 	
 	@Test
-	public void findAllTagsBykewordTest() throws Exception {
+	public void findAllTagsBykeywordTest() throws Exception {
 		log.info("===> {}", hashtagService.findAllTagBykeyword("sum"));
 	}
 
